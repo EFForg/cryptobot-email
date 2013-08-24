@@ -33,3 +33,13 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Virtualenv
+env/
+
+# Vim
+*.swp
+
+# Project-specific
+config.py
+bot_keyring/
