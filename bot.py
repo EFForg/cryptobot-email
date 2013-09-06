@@ -24,7 +24,7 @@ def login(username, password, imap_server):
     return mail
 
 def get_all_mail():
-    mail = login(config.USERNAME, config.PASSWORD, config.IMAP_SERVER)
+    mail = login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
     mail.select("inbox")
     # Get all email in the inbox (with uids instead of sequential ids)
     result, data = mail.uid('search', None, "ALL")
@@ -63,9 +63,34 @@ class OpenPGPEmailParser(object):
                     pass
         return encrypted, signed
 
+def check_keypair(gpg):
+    gen_new_key = True
+    expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
+    fingerprint = None
+
+    seckeys = gpg.list_keys(secret=True)
+    if len(seckeys):
+        for key in seckeys:
+            for uid in key['uids']:
+                if str(uid) == expected_uid:
+                    fingerprint = str(key['fingerprint'])
+                    gen_new_key = False
+
+    if gen_new_key:
+        print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
+        gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL, 
+                                      name_real=config.PGP_NAME, 
+                                      key_type='RSA',
+                                      key_length=4096)
+        key = gpg.gen_key(gpg_input)
+        fingerprint = str(key.fingerprint)
+    
+    return fingerprint
+
 def main():
     pgp_tester = OpenPGPEmailParser()
     gpg = gnupg.GPG(homedir="bot_keyring")
+    fingerprint = check_keypair(gpg)
     imap_conn, message_ids, messages = get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
