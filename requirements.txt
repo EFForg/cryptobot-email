@@ -1,0 +1,5 @@
+argparse==1.2.1
+distribute==0.6.34
+gnupg==1.2.2
+psutil==1.0.1
+wsgiref==0.1.2
