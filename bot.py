@@ -24,7 +24,7 @@ def login(username, password, imap_server):
     return mail
 
 def get_all_mail():
-    mail = login(config.USERNAME, config.PASSWORD, config.IMAP_SERVER)
+    mail = login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
     mail.select("inbox")
     # Get all email in the inbox (with uids instead of sequential ids)
     result, data = mail.uid('search', None, "ALL")
