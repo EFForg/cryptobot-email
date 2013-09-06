@@ -1,2 +1,3 @@
 USERNAME = ""
 PASSWORD = ""
+IMAP_SERVER = ""

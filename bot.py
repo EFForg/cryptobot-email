@@ -18,13 +18,13 @@ except ImportError:
     print >> sys.stderr, "Error: could not load configuration from config.py"
     sys.exit(1)
 
-def login(username, password, imap_server="imap.gmail.com"):
+def login(username, password, imap_server):
     mail = imaplib.IMAP4_SSL(imap_server)
     mail.login(username, password)
     return mail
 
 def get_all_mail():
-    mail = login(config.USERNAME, config.PASSWORD)
+    mail = login(config.USERNAME, config.PASSWORD, config.IMAP_SERVER)
     mail.select("inbox")
     # Get all email in the inbox (with uids instead of sequential ids)
     result, data = mail.uid('search', None, "ALL")
