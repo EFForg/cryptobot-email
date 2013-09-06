@@ -47,7 +47,8 @@ def is_pgp_email(email):
     encrypted, signed = False, False
     for part in email.walk():
         if part.get_content_type() in ("text/plain", "text/html",
-                "application/pgp-signature"):
+                "application/pgp-signature",
+                "application/octet-stream"):
             payload = part.get_payload()
             if PGP_ARMOR_HEADER_MESSAGE in payload:
                 encrypted = True
