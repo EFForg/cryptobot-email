@@ -18,26 +18,55 @@ except ImportError:
     print >> sys.stderr, "Error: could not load configuration from config.py"
     sys.exit(1)
 
-def login(username, password, imap_server):
-    mail = imaplib.IMAP4_SSL(imap_server)
-    mail.login(username, password)
-    return mail
+class OpenPGPBot(object):
+    def __init__(self):
+        self.gpg = gnupg.GPG(homedir="bot_keyring")
+        self.seckey_fp = check_keypair(gpg)
 
-def get_all_mail():
-    mail = login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
-    mail.select("inbox")
-    # Get all email in the inbox (with uids instead of sequential ids)
-    result, data = mail.uid('search', None, "ALL")
-    # result should be 'OK'
-    # data is a list with a space separated list of ids
-    message_ids = data[0].split()
-    messages = []
-    for message_id in message_ids:
-        # fetch the email body (RFC822) for the given ID
-        result, data = mail.uid('fetch', message_id, "(RFC822)")
-        # convert raw email body into EmailMessage
-        messages.append(email.message_from_string(data[0][1]))
-    return mail, message_ids, messages
+    def login(self, username, password, imap_server):
+        mail = imaplib.IMAP4_SSL(imap_server)
+        mail.login(username, password)
+        return mail
+
+    def get_all_mail(self):
+        mail = login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
+        mail.select("inbox")
+        # Get all email in the inbox (with uids instead of sequential ids)
+        result, data = mail.uid('search', None, "ALL")
+        # result should be 'OK'
+        # data is a list with a space separated list of ids
+        message_ids = data[0].split()
+        messages = []
+        for message_id in message_ids:
+            # fetch the email body (RFC822) for the given ID
+            result, data = mail.uid('fetch', message_id, "(RFC822)")
+            # convert raw email body into EmailMessage
+            messages.append(email.message_from_string(data[0][1]))
+        return mail, message_ids, messages
+
+    def check_keypair(self):
+        gen_new_key = True
+        expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
+        fingerprint = None
+
+        seckeys = self.gpg.list_keys(secret=True)
+        if len(seckeys):
+            for key in seckeys:
+                for uid in key['uids']:
+                    if str(uid) == expected_uid:
+                        fingerprint = str(key['fingerprint'])
+                        gen_new_key = False
+
+        if gen_new_key:
+            print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
+            gpg_input = self.gpg.gen_key_input(name_email=config.PGP_EMAIL, 
+                                          name_real=config.PGP_NAME, 
+                                          key_type='RSA',
+                                          key_length=4096)
+            key = self.gpg.gen_key(gpg_input)
+            fingerprint = str(key.fingerprint)
+        
+        return fingerprint
 
 class OpenPGPEmailParser(object):
     def __init__(self):
@@ -63,35 +92,11 @@ class OpenPGPEmailParser(object):
                     pass
         return encrypted, signed
 
-def check_keypair(gpg):
-    gen_new_key = True
-    expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-    fingerprint = None
-
-    seckeys = gpg.list_keys(secret=True)
-    if len(seckeys):
-        for key in seckeys:
-            for uid in key['uids']:
-                if str(uid) == expected_uid:
-                    fingerprint = str(key['fingerprint'])
-                    gen_new_key = False
-
-    if gen_new_key:
-        print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
-        gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL, 
-                                      name_real=config.PGP_NAME, 
-                                      key_type='RSA',
-                                      key_length=4096)
-        key = gpg.gen_key(gpg_input)
-        fingerprint = str(key.fingerprint)
-    
-    return fingerprint
-
 def main():
     pgp_tester = OpenPGPEmailParser()
-    gpg = gnupg.GPG(homedir="bot_keyring")
-    fingerprint = check_keypair(gpg)
-    imap_conn, message_ids, messages = get_all_mail()
+
+    bot = OpenPGPBot()
+    imap_conn, message_ids, messages = bot.get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
         encrypted, signed = pgp_tester.is_pgp_email(message)
