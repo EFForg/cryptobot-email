@@ -27,6 +27,10 @@ virtualenv:
 
 ## Dev Notes
 
+To run the tests:
+
+    $ ./bot_test.py
+
 1. [OpenPGP RFC 4880](http://tools.ietf.org/html/rfc4880)
 2. [MIME RFC 2045](http://tools.ietf.org/html/rfc2045)
 3. [Helpful tutorial for Python's imaplib](http://yuji.wordpress.com/2011/06/22/python-imaplib-imap-example-with-gmail/)
