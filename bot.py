@@ -21,7 +21,7 @@ except ImportError:
 class OpenPGPBot(object):
     def __init__(self):
         self.gpg = gnupg.GPG(homedir="bot_keyring")
-        self.seckey_fp = check_keypair(gpg)
+        self.seckey_fp = self.check_keypair()
 
     def login(self, username, password, imap_server):
         mail = imaplib.IMAP4_SSL(imap_server)
@@ -29,7 +29,7 @@ class OpenPGPBot(object):
         return mail
 
     def get_all_mail(self):
-        mail = login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
+        mail = self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
         mail.select("inbox")
         # Get all email in the inbox (with uids instead of sequential ids)
         result, data = mail.uid('search', None, "ALL")
@@ -80,7 +80,7 @@ class OpenPGPEmailParser(object):
         encrypted, signed = False, False
         for part in email.walk():
             if part.get_content_type() in ("text/plain", "text/html",
-                    "application/pgp-signature"):
+                    "application/pgp-signature", "application/octet-stream"):
                 payload = part.get_payload()
                 if PGP_ARMOR_HEADER_MESSAGE in payload:
                     encrypted = True
