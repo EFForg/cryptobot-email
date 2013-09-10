@@ -6,7 +6,6 @@ An email bot to help you learn OpenPGP!
 import sys
 import imaplib
 import email
-
 import gnupg
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
@@ -68,32 +67,22 @@ class OpenPGPBot(object):
         
         return fingerprint
 
+
 class OpenPGPEmailParser(object):
-    def __init__(self):
-        pass
+    def __init__(self, email=None):
+        self.email = email
 
-    def get_properties(self, email):
-        props = {
-            'encrypted': False,
-            'decryptable': False, # encrypted with the right pubkey
-            'signed': False,
-            'subject_leak': False,
-            'pubkey_attached': False,
-            'pubkey_inline': False,
-            'pubkey_on_keyserver': False,
-            'pubkey_weak': False,
-            'pubkey_same_as_sig': False,
-            'using_mime': False
-        }
-        return props
+    def set_new_email(self, email):
+        self.email = email
+        self.properties = {}
 
-    def is_pgp_email(self, email):
+    def is_pgp_email(self):
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
         encrypted, signed = False, False
-        for part in email.walk():
+        for part in self.email.walk():
             if part.get_content_type() in ("text/plain", "text/html",
                     "application/pgp-signature", "application/octet-stream"):
                 payload = part.get_payload()
@@ -105,20 +94,23 @@ class OpenPGPEmailParser(object):
                     # TODO: might not be ASCII armored. Trial
                     # decryption/verification?
                     pass
-        return encrypted, signed
+        self.properties['encrypted'] = encrypted
+        self.properties['signed'] = signed
+
 
 def main():
     pgp_tester = OpenPGPEmailParser()
-
     bot = OpenPGPBot()
     imap_conn, message_ids, messages = bot.get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
-        encrypted, signed = pgp_tester.is_pgp_email(message)
-        if encrypted:
+        pgp_tester.set_new_email(message)
+        pgp_tester.is_pgp_email()
+        if pgp_tester.properties['encrypted']:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
-        if signed:
+        if pgp_tester.properties['signed']:
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
+
 
 if __name__ == "__main__":
     main()

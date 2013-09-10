@@ -1,0 +1,44 @@
+From nobody Tue Sep 10 13:20:20 2013
+Delivered-To: icontherecord@gmail.com
+Received: by 10.221.40.135 with SMTP id tq7csp16543vcb;
+ Tue, 10 Sep 2013 13:19:44 -0700 (PDT)
+X-Received: by 10.68.164.35 with SMTP id yn3mr1652024pbb.195.1378844384110;
+ Tue, 10 Sep 2013 13:19:44 -0700 (PDT)
+Return-Path: <dan@eff.org>
+Received: from mail2.eff.org (mail2.eff.org. [64.147.188.12])
+ by mx.google.com with ESMTPS id yk3si18388186pac.186.1969.12.31.16.00.00
+ (version=TLSv1.2 cipher=RC4-SHA bits=128/128);
+ Tue, 10 Sep 2013 13:19:44 -0700 (PDT)
+Received-SPF: pass (google.com: domain of dan@eff.org designates 64.147.188.12
+ as permitted sender) client-ip=64.147.188.12; 
+Authentication-Results: mx.google.com;
+ spf=pass (google.com: domain of dan@eff.org designates 64.147.188.12 as
+ permitted sender) smtp.mail=dan@eff.org; 
+ dkim=policy (weak key) header.i=@eff.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=eff.org;
+ s=mail2; 
+ h=Content-Transfer-Encoding:Content-Type:Subject:To:MIME-Version:From:Date:Message-ID;
+ bh=gSMEkP1xWSHTd0e4fDvb6Dvf1oRPCyKe3JojcRt2rK0=; 
+ b=b3iWfNz0anB8Z9fxY+ugT+PxcJ1i9TWpdg8I9xzBJczg779/hhkj6BHW1fH/SY86Ys7+qaXti45wdSSzmKORoPYdgS7mobFAXZXoKuts5qWIE3ZjHsuJYm1Vtxn5CxnF;
+Received: ; Tue, 10 Sep 2013 13:19:43 -0700
+Message-ID: <522F7EDE.2020904@eff.org>
+Date: Tue, 10 Sep 2013 13:19:42 -0700
+From: Dan Auerbach <dan@eff.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64;
+ rv:17.0) Gecko/20130804 Thunderbird/17.0.8
+MIME-Version: 1.0
+To: icontherecord@gmail.com
+Subject: thunderbird test1, subject leak
+X-Enigmail-Version: 1.4.6
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+unencrypted, subject leak
+
+-- 
+Dan Auerbach
+Staff Technologist
+Electronic Frontier Foundation
+dan@eff.org
+415 436 9333 x134
+
