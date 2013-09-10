@@ -1,10 +1,12 @@
+#!/usr/bin/env python
+
 import unittest
 import bot
 
 class BotTest(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.pgp_tester = OpenPGPEmailParser()
 
     def tearDown(self):
         pass
