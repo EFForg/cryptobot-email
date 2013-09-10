@@ -3,16 +3,31 @@
 import unittest
 import bot
 import email
+import gnupg
 
 class BotTest(unittest.TestCase):
 
     def setUp(self):
-        self.pgp_tester = bot.OpenPGPEmailParser()
+        # test keys
+        self.public_key = open('test_key/public.key').read()
+        self.private_key = open('test_key/private.key').read()
+        # set up test keyring
+        self.gpg = gnupg.GPG(homedir="test_bot_keyring")
+        self.gpg.import_keys(self.public_key)
+        self.gpg.import_keys(self.private_key)
+        
+#        sec = self.gpg.secring
+#        print "the secring is %s" % str(sec)
+
+        # set up tester
+        self.pgp_tester = bot.OpenPGPEmailParser(gpg=self.gpg)
         self.emails = {
             'encrypted_to_wrong_key': email.message_from_string(open('test_emails/encrypted_to_wrong_key').read()),
             'signed': email.message_from_string(open('test_emails/signed').read()),
-            'unencrypted_thunderbird': email.message_from_string(open('test_emails/unencrypted_thunderbird').read())
+            'unencrypted_thunderbird': email.message_from_string(open('test_emails/unencrypted_thunderbird').read()),
+            'encrypted_correctly': email.message_from_string(open('test_emails/encrypted_correctly').read())
         }
+
 
     def tearDown(self):
         pass
@@ -37,9 +52,15 @@ class BotTest(unittest.TestCase):
         self.pgp_tester.is_pgp_email()
         self.assertTrue(self.pgp_tester.properties['signed'])
 
-    def test_wrong_key(self):
-        # tododta this needs test key
+    def test_encrypted_wrong_key(self):
+        # tododta fill this out
         pass
+
+    def test_encrypted_correct_key(self):
+        self.pgp_tester.set_new_email(self.emails['encrypted_correctly'])
+        self.pgp_tester.is_pgp_email()
+        result_text = "encrypted text"
+        self.assertEquals(result_text, self.pgp_tester.decrypted_text.split("quoted-printable")[1].strip())
 
 
 if __name__ == '__main__':

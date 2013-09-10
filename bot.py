@@ -17,10 +17,9 @@ except ImportError:
     print >> sys.stderr, "Error: could not load configuration from config.py"
     sys.exit(1)
 
-class OpenPGPBot(object):
+class EmailFetcher(object):
     def __init__(self):
-        self.gpg = gnupg.GPG(homedir="bot_keyring")
-        self.seckey_fp = self.check_keypair()
+        pass
 
     def login(self, username, password, imap_server):
         mail = imaplib.IMAP4_SSL(imap_server)
@@ -43,6 +42,18 @@ class OpenPGPBot(object):
             messages.append(email.message_from_string(data[0][1]))
         return mail, message_ids, messages
 
+
+class OpenPGPEmailParser(object):
+    def __init__(self, gpg=None, email=None):
+        if not gpg:
+            self.gpg = gnupg.GPG(homedir="bot_keyring")
+        else:
+            self.gpg = gpg
+        self.email = email
+        w = self.gpg.list_keys(secret=True)
+        print "the hh is %s" % w
+
+    # todo: reincorporate check_keypair where appropriate
     def check_keypair(self):
         gen_new_key = True
         expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
@@ -67,11 +78,6 @@ class OpenPGPBot(object):
         
         return fingerprint
 
-
-class OpenPGPEmailParser(object):
-    def __init__(self, email=None):
-        self.email = email
-
     def set_new_email(self, email):
         self.email = email
         self.properties = {}
@@ -85,9 +91,15 @@ class OpenPGPEmailParser(object):
         for part in self.email.walk():
             if part.get_content_type() in ("text/plain", "text/html",
                     "application/pgp-signature", "application/octet-stream"):
-                payload = part.get_payload()
+                payload = part.get_payload().strip()
                 if PGP_ARMOR_HEADER_MESSAGE in payload:
                     encrypted = True
+                    # try to decrypt
+                    #print "BEGINPAYLOAD\n%s\nENDPAYLOAD" % payload
+                    #print "BEGINDECRYPTINGPAYLOAD"
+                    self.decrypted_text = str(self.gpg.decrypt(payload))
+                    #print "ENDDECRYPTIONPAYLOAD"
+                    #print "BEGINDEC\n%s\nENDDEC" % str(a)
                 elif PGP_ARMOR_HEADER_SIGNATURE in payload:
                     signed = True
                 else:
@@ -99,11 +111,12 @@ class OpenPGPEmailParser(object):
 
 
 def main():
+    fetcher = EmailFetcher()
     pgp_tester = OpenPGPEmailParser()
-    bot = OpenPGPBot()
-    imap_conn, message_ids, messages = bot.get_all_mail()
+    imap_conn, message_ids, messages = fetcher.get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
+        print "BEGINMESSAGE\n%s\nENDMESSAGE" % str(message)
         pgp_tester.set_new_email(message)
         pgp_tester.is_pgp_email()
         if pgp_tester.properties['encrypted']:

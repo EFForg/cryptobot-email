@@ -1,0 +1,75 @@
+From nobody Tue Sep 10 15:50:47 2013
+Delivered-To: icontherecord@gmail.com
+Received: by 10.221.40.135 with SMTP id tq7csp22269vcb;
+ Tue, 10 Sep 2013 15:47:52 -0700 (PDT)
+X-Received: by 10.68.226.3 with SMTP id ro3mr27995074pbc.72.1378853272070;
+ Tue, 10 Sep 2013 15:47:52 -0700 (PDT)
+Return-Path: <dan@eff.org>
+Received: from mail2.eff.org (mail2.eff.org. [64.147.188.12])
+ by mx.google.com with ESMTPS id xn6si18520561pbc.122.1969.12.31.16.00.00
+ (version=TLSv1.2 cipher=RC4-SHA bits=128/128);
+ Tue, 10 Sep 2013 15:47:52 -0700 (PDT)
+Received-SPF: pass (google.com: domain of dan@eff.org designates 64.147.188.12
+ as permitted sender) client-ip=64.147.188.12; 
+Authentication-Results: mx.google.com;
+ spf=pass (google.com: domain of dan@eff.org designates 64.147.188.12 as
+ permitted sender) smtp.mail=dan@eff.org; 
+ dkim=policy (weak key) header.i=@eff.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=eff.org;
+ s=mail2; 
+ h=Content-Type:Subject:To:MIME-Version:From:Date:Message-ID;
+ bh=hyBHQJSm13D+AWrVIwO/CjWNgST4ZiYJ3cbUTuwz5hs=; 
+ b=NMUBUNwMmvq5FlgvkwqLoR1EFaMul7ad0XGHHu5ThM/BmTR/Mhus9BgGvg3B1jy0b5tzQe+5/TDpv8lTkCizLhEmiSNh+eSxP64bLO7Crqt4LaqON5N2gGls8R5NUgK1;
+Received: ; Tue, 10 Sep 2013 15:47:51 -0700
+Message-ID: <522FA196.5080101@eff.org>
+Date: Tue, 10 Sep 2013 15:47:50 -0700
+From: Dan Auerbach <dan@eff.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64;
+ rv:17.0) Gecko/20130804 Thunderbird/17.0.8
+MIME-Version: 1.0
+To: icontherecord@gmail.com
+Subject: test subject
+X-Enigmail-Version: 1.4.6
+Content-Type: multipart/encrypted; protocol="application/pgp-encrypted";
+ boundary="------------enigB8D10FC505723F94D2D2222F"
+
+This is an OpenPGP/MIME encrypted message (RFC 2440 and 3156)
+--------------enigB8D10FC505723F94D2D2222F
+Content-Type: application/pgp-encrypted
+Content-Description: PGP/MIME version identification
+
+Version: 1
+
+--------------enigB8D10FC505723F94D2D2222F
+Content-Type: application/octet-stream; name="encrypted.asc"
+Content-Description: OpenPGP encrypted message
+Content-Disposition: inline; filename="encrypted.asc"
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Using GnuPG with undefined - http://www.enigmail.net/
+
+hQIMAzP6ghUQ/iwsARAAlIuWYqh/Rc+Aw2KumAO0UvCIuei+jqS8okr6TKoduD73
+wAYJLk1cW+xpQwSj2zeWfWt2o/uv35AM6jL3h21LQ6jE8pPZ4JeM3I6vZ3MUkpBz
+1QBF8Gmuyxcfjw6Dfhx2bAF1SYqrj19o3drdGc2sUNEPagSbDRq4Y2KwASB2M7Zl
+DuUou+euyD5dNuts0o1JDLVj9DWHSoqyve4iz3Ugi6mwCUUlwo5YzxJshujWEIuW
+yCKr6KRvLBnSJe7DQzj6gB1A1t9wWxGr/K5p4BqmVDCWRduykjoXMgLT87QmyRhZ
+QTUAwYC3NiWz4yj7wdE/cEiOvCSkD1unc/mCiw6YpFq6vwc5n0fQr5j2fsPQ3/8U
+p4eJe24KnbvxcnpsHAhEpDZcnkcM3TsS2zgIUPFKFyiU6MYwMVy19ARnDA6aXrba
+fRvWNJXVKfwxt0GPeXr0OHnaHuGj+SLAN9NG+8en+A87iwxi/l4kFtU+on1wP+g/
+160mUFWF9JFlyY1Wluzbk6Hk7XStW2Y9GrpInmiwf06QkLPAyISUcozcXaNz4Xb+
+c42kvSkeWnUX2b1fev2IoNCzrI8Q8OCsEU5D0B314o9OfUhJO11Fs8NdVSVkoNkI
+JFMCEqQOB6PUTIHixWVIAYAldMxJuzoPB7RG1/kGfysP6X7euPo0cnH5LnKoJhqF
+AQwDx1kttgTrKeEBCADnLS0dgfH75X5c5VIKnlsbgKEkEC1BDaHMb3Tt5Z/9JHBM
+BUfxD9heKEzjqoDYOZ3gOPEequvRwRxwsme1rL1RMJFcnCmyhAz0aqKXwBrGMlwY
+x6PiD5rzTNWHEJ8Y5NVG2PZocBz9JTqwwBts07SGn95223ma0IVzB1JYbuhEnFqB
+9gCsSQWwF5jGCzt/oDc55240KRMqiHL1Pjn2QDXVpEsw/Mx+4NiZ6+H2PN3QHZRi
++ScMVZ8lhgOG+JsIfxNn+J3qJK/XLryMAiVBtpsTyxeG3BDq2T2D/6Q4Fg+VPMo7
+HK70YV1RYrWYXa4az1uWijoTufGaXuszKCKbXIuz0p0BoRjd0YQ2TbAmzzKGPk9G
+WhKQkoJTAb9Zl/7jpEq041lqMUTQp9az6ZQkHu/ODRWsFArKi6aci+kr5/EnLSET
+z6pmERfNN3/ejNQpvMYR/3IEt0qyCaPLxf6ZrhD0FeTcrhIv8pe77qJvorZ4DhfR
+9DLsxI+hVqQQhdSw0VquiJ3xkcNt5QzUKvl/TnuP/SBXhC/UhNHYzIHd41KI
+=RwKZ
+-----END PGP MESSAGE-----
+
+--------------enigB8D10FC505723F94D2D2222F--
