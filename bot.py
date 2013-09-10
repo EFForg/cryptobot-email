@@ -49,7 +49,7 @@ class OpenPGPEmailParser(object):
             self.gpg = gnupg.GPG(homedir="bot_keyring")
         else:
             self.gpg = gpg
-        self.email = email
+        self.set_new_email(email)
 
     # todo: reincorporate check_keypair where appropriate
     def check_keypair(self):
@@ -79,12 +79,15 @@ class OpenPGPEmailParser(object):
     def set_new_email(self, email):
         self.email = email
         self.properties = {}
+        self.is_pgp_email()
 
     def is_pgp_email(self):
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
+        if not self.email:
+            return
         encrypted, signed = False, False
         for part in self.email.walk():
             if part.get_content_type() in ("text/plain", "text/html",
