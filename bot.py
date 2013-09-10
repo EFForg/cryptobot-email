@@ -50,8 +50,6 @@ class OpenPGPEmailParser(object):
         else:
             self.gpg = gpg
         self.email = email
-        w = self.gpg.list_keys(secret=True)
-        print "the hh is %s" % w
 
     # todo: reincorporate check_keypair where appropriate
     def check_keypair(self):
@@ -116,7 +114,6 @@ def main():
     imap_conn, message_ids, messages = fetcher.get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
-        print "BEGINMESSAGE\n%s\nENDMESSAGE" % str(message)
         pgp_tester.set_new_email(message)
         pgp_tester.is_pgp_email()
         if pgp_tester.properties['encrypted']:

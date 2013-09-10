@@ -16,9 +16,6 @@ class BotTest(unittest.TestCase):
         self.gpg.import_keys(self.public_key)
         self.gpg.import_keys(self.private_key)
         
-#        sec = self.gpg.secring
-#        print "the secring is %s" % str(sec)
-
         # set up tester
         self.pgp_tester = bot.OpenPGPEmailParser(gpg=self.gpg)
         self.emails = {
