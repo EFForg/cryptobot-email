@@ -70,13 +70,17 @@ class OpenPGPBot(object):
 
 class OpenPGPEmailParser(object):
     def __init__(self, email=None):
-        self.email = email
+        self.set_new_email(email)
 
     def set_new_email(self, email):
         self.email = email
         self.properties = {}
+        self.is_pgp_email()
 
     def is_pgp_email(self):
+        if not self.email:
+            return
+
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
         # 1. Multipart and non-multipart emails
@@ -105,7 +109,6 @@ def main():
     for message in messages:
         print "received message: %s" % message['Subject']
         pgp_tester.set_new_email(message)
-        pgp_tester.is_pgp_email()
         if pgp_tester.properties['encrypted']:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
         if pgp_tester.properties['signed']:

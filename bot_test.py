@@ -18,22 +18,18 @@ class BotTest(unittest.TestCase):
 
     def test_encrypted(self):
         self.pgp_tester.set_new_email(self.emails['encrypted_to_wrong_key'])
-        self.pgp_tester.is_pgp_email()
         self.assertTrue(self.pgp_tester.properties['encrypted'])
 
     def test_unencrypted(self):
         self.pgp_tester.set_new_email(self.emails['unencrypted_thunderbird'])
-        self.pgp_tester.is_pgp_email()
         self.assertFalse(self.pgp_tester.properties['encrypted'])
 
     def test_signed(self):
         self.pgp_tester.set_new_email(self.emails['signed'])
-        self.pgp_tester.is_pgp_email()
         self.assertTrue(self.pgp_tester.properties['signed'])
         
     def test_unsigned(self):
         self.pgp_tester.set_new_email(self.emails['signed'])
-        self.pgp_tester.is_pgp_email()
         self.assertTrue(self.pgp_tester.properties['signed'])
 
     def test_wrong_key(self):
