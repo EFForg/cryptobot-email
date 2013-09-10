@@ -1,0 +1,81 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: wsmfzz62@gmail.com
+Received: by 10.221.4.194 with SMTP id od2csp369936vcb;
+        Fri, 6 Sep 2013 14:56:33 -0700 (PDT)
+X-Received: by 10.66.50.131 with SMTP id c3mr6095947pao.111.1378504593373;
+        Fri, 06 Sep 2013 14:56:33 -0700 (PDT)
+Return-Path: <micah@eff.org>
+Received: from mail2.eff.org (mail2.eff.org. [64.147.188.12])
+        by mx.google.com with ESMTPS id hi6si148084pac.113.1969.12.31.16.00.00
+        (version=TLSv1.2 cipher=RC4-SHA bits=128/128);
+        Fri, 06 Sep 2013 14:56:33 -0700 (PDT)
+Received-SPF: pass (google.com: domain of micah@eff.org designates 64.147.188.12 as permitted sender) client-ip=64.147.188.12;
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of micah@eff.org designates 64.147.188.12 as permitted sender) smtp.mail=micah@eff.org;
+       dkim=policy (weak key) header.i=@eff.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=eff.org; s=mail2;
+    h=Content-Type:Subject:To:MIME-Version:From:Date:Message-ID; bh=2EMayH/r7Q/p3uH7c1y+XXNJAUXjCL18LDkD6pLVGsY=;
+    b=yO9hWb7fAKg0Xks6h6o4x82EVMDJiUNDsY0qXonLOHYkytE2PgqZXhF1A8md6G9z8HNThXyQCMcbq9V45N1Ea9xW3MXuUMNxSh8J8k3EOV5fClYhEsxG8TY+8H/QsNRw;
+Received: ; Fri, 06 Sep 2013 14:56:32 -0700
+Message-ID: <522A4F7F.6070003@eff.org>
+Date: Fri, 06 Sep 2013 14:56:15 -0700
+From: Micah Lee <micah@eff.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130827 Icedove/17.0.8
+MIME-Version: 1.0
+To: wsmfzz62@gmail.com
+Subject: encrypted message
+X-Enigmail-Version: 1.5.1
+Content-Type: multipart/encrypted;
+ protocol="application/pgp-encrypted";
+ boundary="----enig2IINCGBKRTVWUATDPEFHX"
+
+This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+------enig2IINCGBKRTVWUATDPEFHX
+Content-Type: application/pgp-encrypted
+Content-Description: PGP/MIME version identification
+
+Version: 1
+
+------enig2IINCGBKRTVWUATDPEFHX
+Content-Type: application/octet-stream; name="encrypted.asc"
+Content-Description: OpenPGP encrypted message
+Content-Disposition: inline; filename="encrypted.asc"
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+Comment: Using GnuPG with Icedove - http://www.enigmail.net/
+
+hQIMA86M3VXog5+ZAQ/7BHLdWuPA/86lz9B9uDIYGzNXnaiPgzzGPInPyTImt6ua
+0GeDHC7Kb0GdFQWnA9auXBdOJJp+t7XyB5hv7G3vhM1/qSW11zg+/aE8h9w7MItl
+tsfU3S9oQCJwCxHRHyCFY7HNlbLibqIZdxjroTMftZatsyycfRpNZxt9D19A80E0
+EEqL9gQM5/oOJOb/7F5cti5xPufFzL3ibxCDx9+iXp4VdUydrkrV9J9E2nAHQukw
+bepCpGZFNLSJqruPs5TcDtfM66iL0P/v/QZEqzjCxd9sBm5KIDcadY6sR3u2LwwT
+CCLq0vE2tLEI6RzqELs+ncNAN0yPkHmBU9LZN7GrieozEvlQMCpfAzLtsRJm8pmZ
+jjuuGjjydgNtP2N03MaIc8hDvMKRqJzamy7fA+ygaloEr2iYvcihIJI4O3KlhTzG
+V/VXqDdjv5kCRxaH1qmX7AcvCRetumVsl9IQbEfAjti0FL5y1Zcdi0hb6Bf/VuO1
+6TNZHCYvUsgfvk23UKajTRxwerGfi2rdf+wlJFemI/NAmCUN1qihTgj/qrY8hj+B
+bYUkguMzBE+GzefjHrNhMz8ONgLSA5B37CeMw2vimWr8krKlyFzeSkf/LOCE3atj
+RMzjtV63GKAFAGZjf7EYFI/JdAVUB8/1L0Xk7tQAtcv5tw1t4EMOqnsAPXVc8yHS
+6QHtrOVyMxJB4PJ+4EzWFCtGz4nBYRyBY5tCb9b+atydL5gttHSLhCgUSGgFeOhv
+O8qBACQXPL3Qjtnvh23+A3dDGwTrzSvdWxpYjeqgvUoOW3+TJmZzLqJA8dFPR6dy
+pJtre1QrxLQYfC3UN/pBv9s6qLuA9dHUI6pCCeDgWyDfZdnVsSOqXJAJeWr9lxCa
+vSsjA0sq2Wof7DqL8nuKYxxuGPRDKLzN4aPH+1by9UvGzxoCLU3Q1Z+Z/0tN33XH
+1g8xdwSkt7EHtFuLjP6qGN/iTHrBJMnT6XbxaGtT7CyCsSG1SBVm/U7vKE77rD73
+pVKYYNVhuWafMoeC5m++yo7a7cZuGnIsTRwZIqulmeQsYFBHxiowqAijJHyLwK/j
+lLvTZ/EuqfIBBAtssVVeRvfiA2RlZKwJvFXIwaaKbqn13vzD/3iP5ykJYW4azqU9
+YN2wp/sYFEJt/WCDjzuUR1JlNM1Q7pG90c/HykAOqjzlU6dogZZdGHt/ndYQmDYB
+2oXm32snLEIGTqcWe7rNxKhuRdRN4JH9t6heFAh3hPRxAtRpUcCjOXXh7r5rXrSq
+ujbejwEBQ4zF7XQKY0dGu9/1qbuLyQ1vEOC6HRQ0MgtBN+xGWzs3/XatNeuI7YLs
+tz1yEWvKA6gCh4GqMsUjfJCU58TsVs5jXQ0DMLOAbqj7wMAVnUEjy71qLMCXUQc1
+MhEAejuR3SJ0OsjxhW9uNiSANvUFHTsdf8FDt1aSLDJ4jqzm9KND5vPevJRqJq/J
+Z9Dp74cmrr38YkuJf5Yf/M+5XcdN0JciupYiS19mElXnZVKyibo18/LReTOUDo7Q
+iJu1ijIWEFLl2L8L89bohtG4BoIFM66L+MyHT/P5QPmtz0Bymrz1pA+HA+vOGqwx
++BzOfRjGsYrEBO76WVTwl9MuQ6dydHN5i85YKJqGECUoO9UO0hHGfdI40bXTd83r
+FTNABpdTL0Vjw8ipiUL9D9AY3zMTivrWLAnwOqOJFr/YtR3eE9+yDW/GBOeS7lpA
+szh/3Pfey4L06oh21+/JEHtuvzFxntM9Fx36TBHZrm7pkgKJFuMKeiuG8lbqufTy
+1+IKH12lbDSBuKZp38770oQMuJmAErYl3b0U72lvlc64Rb4uhMsb599ZrP23UDRH
+TgC5Op+ucO5jr0Ghgo88HC/YEn+eKPl0yignLxJZYMpe6pU=
+=NGdP
+-----END PGP MESSAGE-----
+
+------enig2IINCGBKRTVWUATDPEFHX--

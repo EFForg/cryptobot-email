@@ -1,0 +1,70 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: wsmfzz62@gmail.com
+Received: by 10.221.4.194 with SMTP id od2csp369918vcb;
+        Fri, 6 Sep 2013 14:56:02 -0700 (PDT)
+X-Received: by 10.66.219.200 with SMTP id pq8mr6199380pac.123.1378504561959;
+        Fri, 06 Sep 2013 14:56:01 -0700 (PDT)
+Return-Path: <micah@eff.org>
+Received: from mail2.eff.org (mail2.eff.org. [64.147.188.12])
+        by mx.google.com with ESMTPS id dj4si4440683pbc.74.1969.12.31.16.00.00
+        (version=TLSv1.2 cipher=RC4-SHA bits=128/128);
+        Fri, 06 Sep 2013 14:56:01 -0700 (PDT)
+Received-SPF: pass (google.com: domain of micah@eff.org designates 64.147.188.12 as permitted sender) client-ip=64.147.188.12;
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of micah@eff.org designates 64.147.188.12 as permitted sender) smtp.mail=micah@eff.org;
+       dkim=policy (weak key) header.i=@eff.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=eff.org; s=mail2;
+    h=Content-Type:Subject:To:MIME-Version:From:Date:Message-ID; bh=SkZU0tUuwMyNYLglh8cZl2mK4slqwJGa7EEweyhH9l0=;
+    b=bK8LSciP8WhBvdvZLoCvE1uYaN2PBzoMaHOFn4xWsxQ2lLnSKwOaMzckHzk2O0aTX6KOZA7yV1IOdY3/9jtWSfi2jyb3NiVlZMHgx8v2MzsbC/ePDpxd/GKiQSUWqA5w;
+Received: ; Fri, 06 Sep 2013 14:56:01 -0700
+Message-ID: <522A4F5F.6000400@eff.org>
+Date: Fri, 06 Sep 2013 14:55:43 -0700
+From: Micah Lee <micah@eff.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130827 Icedove/17.0.8
+MIME-Version: 1.0
+To: wsmfzz62@gmail.com
+Subject: signed message
+X-Enigmail-Version: 1.5.1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="----enig2KEXGDLRQQFHHUKXHVSAR"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2KEXGDLRQQFHHUKXHVSAR
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+this is signed
+--=20
+Micah Lee
+Staff Technologist
+Electronic Frontier Foundation
+https://eff.org/join
+@micahflee
+
+
+------enig2KEXGDLRQQFHHUKXHVSAR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+Comment: Using GnuPG with Icedove - http://www.enigmail.net/
+
+iQIcBAEBAgAGBQJSKk9fAAoJELTSWh6ZmZaXCQsP/RSbGoDSmM+yDyzPQRZE4Ugy
+LIkz56wHaYezD0mpVYW7ahe7eAI5fQ/a4o3ThgYhMoxWoK9yHmbs2X0U4DyhatKg
+9zBFekSM38Yw7yDJrGiOUd583gp1BdyP+8BGje8rJxi46JM1qZw3YLVw1LDoUo9h
+YMBdYAY2uadq8LZmruGwHRmGJg7QcFsHEtq/7okSWv3W2ibwMGNYp54bUrPgD1cE
+uOnLANU5fOvd9a1tejDJPjDczGWQRhQZPUYc0IFkpUmXYxjsx/vjgFup6kFgaSVH
+bLcc6tOcRlj+oUAcaveDC1Hcw6O8RtmA5b17JAQJ4/ALQ+Zpqjl3BUoiS5TZFaIZ
+MGq8m+hSIBbgUWwfiaxnEzjb5XlEKnDb4omUKuUESrLhPZA7NQY6LpUdMb/j60N2
+WhN7oLAwbMv16rsyyQCt+j5wX9K/3cKxVWI6VZJr289ZwnR7uV61qZ0hWpah3QO3
+47w7nAHaO8ASBRm1RlX7U54ExmaaxBsrdaBkZWMcmGRoiEFedSKCpJsR9CjzgC6T
+jWXknAp1105v7/qSCnP7Xf83m0gE64enLnOwP/tDLnGReXAareSv77mEVBQ5ecf2
+UJ+/rnGEj1Em2OaqkD37BZfIIFnLo/LdHrjDhqmZdzsQpE4Jq+1i6WZNR8nGTs1O
+vnETR0tTXxGWPwY9K94h
+=PunG
+-----END PGP SIGNATURE-----
+
+------enig2KEXGDLRQQFHHUKXHVSAR--

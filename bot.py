@@ -72,6 +72,21 @@ class OpenPGPEmailParser(object):
     def __init__(self):
         pass
 
+    def get_properties(self, email):
+        props = {
+            'encrypted': False,
+            'decryptable': False, # encrypted with the right pubkey
+            'signed': False,
+            'subject_leak': False,
+            'pubkey_attached': False,
+            'pubkey_inline': False,
+            'pubkey_on_keyserver': False,
+            'pubkey_weak': False,
+            'pubkey_same_as_sig': False,
+            'using_mime': False
+        }
+        return props
+
     def is_pgp_email(self, email):
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
