@@ -93,7 +93,6 @@ class OpenPGPEmailParser(object):
                 if PGP_ARMOR_HEADER_MESSAGE in payload:
                     encrypted = True
                     # try to decrypt
-                    print "Type is " + str(type(self.gpg.decrypt(payload)))
                     self.decrypted_text = str(self.gpg.decrypt(payload))
                 elif PGP_ARMOR_HEADER_SIGNATURE in payload:
                     signed = True
