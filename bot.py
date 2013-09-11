@@ -121,7 +121,7 @@ class OpenPGPEmailParser(object):
 
 
 def main():
-    fetcher = EmailFetcher(maildir=True)
+    fetcher = EmailFetcher(maildir=config.MAILDIR)
     pgp_tester = OpenPGPEmailParser()
     imap_conn, message_ids, messages = fetcher.get_all_mail()
     for message in messages:
