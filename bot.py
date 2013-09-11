@@ -4,7 +4,7 @@ An email bot to help you learn OpenPGP!
 """
 
 import sys
-import imaplib
+import imaplib, smtplib
 import email
 import gnupg
 
@@ -42,6 +42,26 @@ class EmailFetcher(object):
             messages.append(email.message_from_string(data[0][1]))
         return mail, message_ids, messages
 
+class EmailSender(object):
+    def __init__(self, to_email, subject, body):
+        from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
+        msg = email.mime.text.MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = from_email
+        msg['To'] = to_email
+
+        s = smtplib.SMTP_SSL(config.SMTP_SERVER)
+        s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
+        s.sendmail(from_email, [to_email], msg.as_string())
+        s.quit()
+
+    def sign_body(self):
+        # need to implement PGP/MIME to sign the body here
+        pass
+    
+    def encrypt_body(self):
+        # need to implement PGP/MIME to sign the body here
+        pass
 
 class OpenPGPEmailParser(object):
     def __init__(self, gpg=None, email=None):
