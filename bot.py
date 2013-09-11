@@ -18,15 +18,28 @@ except ImportError:
     sys.exit(1)
 
 class EmailFetcher(object):
-    def __init__(self):
-        pass
+    def __init__(self, maildir=False):
+        self.maildir = maildir
 
     def login(self, username, password, imap_server):
         mail = imaplib.IMAP4_SSL(imap_server)
         mail.login(username, password)
         return mail
 
+    def get_maildir_directly(self):
+        # todo: improve this function and make return values consistent
+        import mailbox
+        mailbox.Maildir.colon = '!'
+        md = mailbox.Maildir(config.MAILDIR)
+        return None, None, [email.message_from_string(str(msg)) for msg in md.values()]
+
     def get_all_mail(self):
+        if self.maildir:
+            return self.get_maildir_directly()
+        else:
+            return self.get_imap_mail()
+
+    def get_imap_mail(self):
         mail = self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
         mail.select("inbox")
         # Get all email in the inbox (with uids instead of sequential ids)
@@ -108,13 +121,12 @@ class OpenPGPEmailParser(object):
 
 
 def main():
-    fetcher = EmailFetcher()
+    fetcher = EmailFetcher(maildir=True)
     pgp_tester = OpenPGPEmailParser()
     imap_conn, message_ids, messages = fetcher.get_all_mail()
     for message in messages:
         print "received message: %s" % message['Subject']
         pgp_tester.set_new_email(message)
-        pgp_tester.is_pgp_email()
         if pgp_tester.properties['encrypted']:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
         if pgp_tester.properties['signed']:
