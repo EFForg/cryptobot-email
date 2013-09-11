@@ -18,13 +18,9 @@ class BotTest(unittest.TestCase):
         
         # set up tester
         self.pgp_tester = bot.OpenPGPEmailParser(gpg=self.gpg)
-        self.emails = {
-            'encrypted_to_wrong_key': email.message_from_string(open('test_emails/encrypted_to_wrong_key').read()),
-            'signed': email.message_from_string(open('test_emails/signed').read()),
-            'unencrypted_thunderbird': email.message_from_string(open('test_emails/unencrypted_thunderbird').read()),
-            'encrypted_correctly': email.message_from_string(open('test_emails/encrypted_correctly').read())
-        }
-
+        self.emails = {}
+        for filename in ['encrypted_to_wrong_key', 'signed', 'unencrypted_thunderbird', 'encrypted_correctly']: 
+            self.emails[filename] = email.message_from_string(open('test_emails/'+filename).read())
 
     def tearDown(self):
         pass
