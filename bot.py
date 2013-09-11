@@ -114,7 +114,6 @@ def main():
     for message in messages:
         print "received message: %s" % message['Subject']
         pgp_tester.set_new_email(message)
-        pgp_tester.is_pgp_email()
         if pgp_tester.properties['encrypted']:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
         if pgp_tester.properties['signed']:
