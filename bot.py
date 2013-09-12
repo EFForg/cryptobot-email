@@ -22,10 +22,16 @@ class EmailFetcher(object):
     def __init__(self, maildir=False):
         self.maildir = maildir
 
+        if not self.maildir:
+            self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
+
+    def __del__(self):
+        if not self.maildir:
+            self.imap_mail.expunge()
+
     def login(self, username, password, imap_server):
-        mail = imaplib.IMAP4_SSL(imap_server)
-        mail.login(username, password)
-        return mail
+        self.imap_mail = imaplib.IMAP4_SSL(imap_server)
+        self.imap_mail.login(username, password)
 
     def get_maildir_directly(self):
         # todo: improve this function and make return values consistent
@@ -34,27 +40,32 @@ class EmailFetcher(object):
         md = mailbox.Maildir(config.MAILDIR)
         return None, None, [email.message_from_string(str(msg)) for msg in md.values()]
 
-    def get_all_mail(self):
-        if self.maildir:
-            return self.get_maildir_directly()
-        else:
-            return self.get_imap_mail()
-
     def get_imap_mail(self):
-        mail = self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
-        mail.select("inbox")
+        self.imap_mail.select("inbox")
         # Get all email in the inbox (with uids instead of sequential ids)
-        result, data = mail.uid('search', None, "ALL")
+        result, data = self.imap_mail.uid('search', None, "ALL")
         # result should be 'OK'
         # data is a list with a space separated list of ids
         message_ids = data[0].split()
         messages = []
         for message_id in message_ids:
             # fetch the email body (RFC822) for the given ID
-            result, data = mail.uid('fetch', message_id, "(RFC822)")
+            result, data = self.imap_mail.uid('fetch', message_id, "(RFC822)")
             # convert raw email body into EmailMessage
             messages.append(email.message_from_string(data[0][1]))
-        return mail, message_ids, messages
+        return message_ids, messages
+
+    def get_all_mail(self):
+        if self.maildir:
+            return self.get_maildir_directly()
+        else:
+            return self.get_imap_mail()
+
+    def delete(self, message_id):
+        if self.maildir:
+            pass
+        else:
+            self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
     def __init__(self, message, pgp_tester):
@@ -170,7 +181,9 @@ class OpenPGPEmailParser(object):
 def main():
     fetcher = EmailFetcher(maildir=config.MAILDIR)
     pgp_tester = OpenPGPEmailParser()
-    imap_conn, message_ids, messages = fetcher.get_all_mail()
+    message_ids, messages = fetcher.get_all_mail()
+    for i in xrange(len(message_ids)):
+        messages[i].message_id = message_ids[i]
     for message in messages:
         pgp_tester.set_new_email(message)
 
@@ -183,7 +196,9 @@ def main():
         EmailSender(message, pgp_tester)
 
         # delete the email
-
+        # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
+        #  http://gmailblog.blogspot.com/2008/10/new-in-labs-advanced-imap-controls.html )
+        fetcher.delete(message.message_id)
 
 if __name__ == "__main__":
     main()
