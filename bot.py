@@ -9,7 +9,7 @@ import sys
 import imaplib, smtplib
 import email
 import gnupg
-#import jinja2
+import jinja2
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -70,53 +70,63 @@ class EmailFetcher(object):
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
-    def __init__(self, message, pgp_tester):
+    def __init__(self, message, pgp_tester, env):
         self.message = message
         self.pgp_tester = pgp_tester
+        self.env = env
+        self.construct_and_send_email()
 
+    def construct_and_send_email(self):
         # who to respond to?
         to_email = None
-        if 'Reply-To' in message:
-            to_email = message['Reply-To']
-        elif 'From' in message:
-            to_email = message['From']
+        if 'Reply-To' in self.message:
+            to_email = self.message['Reply-To']
+        elif 'From' in self.message:
+            to_email = self.message['From']
         if not to_email:
             print 'Cannot decide who to respond to '
             return
 
         # what the response subject should be
-        if 'Subject' in message:
-            if message['Subject'][:4] != 'Re: ':
-                subject = 'Re: '+message['Subject']
+        if 'Subject' in self.message:
+            if self.message['Subject'][:4] != 'Re: ':
+                subject = 'Re: '+self.message['Subject']
             else:
                 subject = message['Subject']
         else:
             subject = 'OpenPGPBot response'
 
-        # todo: make a response template based on information in pgp_tester (#2)
-        txt_body = 'This is a OpenPGPBot txt response.'
-        html_body = '<html><body><h1>This is an OpenPGPBot html response!</h1></body></html>'
-
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
+
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = from_email
+        msg['To'] = to_email
+
+        # make a response template based on information in pgp_tester (#2)
+        # todo: do this for plain txt emails too
+        html_template = self.env.get_template('email_template.html')
+        html_template_vars = {'encrypted_html' : '<h1> Dan test: your email is encrypted!</h1><br>',
+                              'signed_html': '<h1> Dan test: your email is signed!</h1>'}
+        html_body = html_template.render(html_template_vars)
+
+        txt_body = 'This is a OpenPGPBot txt response.'
+
 
         # support both html and plain text responses
         txt_part = MIMEText(txt_body, 'plain')
         html_part = MIMEText(html_body, 'html')
-
-        msg = MIMEMultipart('alternative')
-
-        msg['Subject'] = subject
-        msg['From'] = from_email
-        msg['To'] = to_email
     
         msg.attach(txt_part)
         msg.attach(html_part)
+        self.send_email(msg, from_email, to_email)
 
+    def send_email(self, msg, from_email, to_email):
         s = smtplib.SMTP_SSL(config.SMTP_SERVER)
         s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
         s.sendmail(from_email, [to_email], msg.as_string())
         s.quit()
-        print 'Responded to {0}'.format(message['From'])
+        print 'Responded to {0}'.format(self.message['From'])
 
     def sign_body(self):
         # need to implement PGP/MIME to sign the body here
@@ -191,6 +201,12 @@ class OpenPGPEmailParser(object):
 
 
 def main():
+    # todo? use fancier version of jinja2
+    # e.g. 
+    templateLoader = jinja2.FileSystemLoader(searchpath="templates")
+    templateEnv = jinja2.Environment(loader=templateLoader)
+    #env = Environment(loader=PackageLoader('OpenPGPBot', 'templates'))
+
     fetcher = EmailFetcher(maildir=config.MAILDIR)
     pgp_tester = OpenPGPEmailParser()
     message_ids, messages = fetcher.get_all_mail()
@@ -205,7 +221,7 @@ def main():
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
 
         # respond to the email
-        EmailSender(message, pgp_tester)
+        EmailSender(message, pgp_tester, templateEnv)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
