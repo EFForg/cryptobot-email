@@ -6,6 +6,7 @@ An email bot to help you learn OpenPGP!
 import sys
 import imaplib, smtplib
 import email
+from email.mime.text import MIMEText
 import gnupg
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
@@ -43,9 +44,34 @@ class EmailFetcher(object):
         return mail, message_ids, messages
 
 class EmailSender(object):
-    def __init__(self, to_email, subject, body):
+    def __init__(self, message, pgp_tester):
+        self.message = message
+        self.pgp_tester = pgp_tester
+
+        # who to respond to?
+        to_email = None
+        if 'Reply-To' in message:
+            to_email = message['Reply-To']
+        elif 'From' in message:
+            to_email = message['From']
+        if not to_email:
+            print 'Cannot decide who to respond to '
+            return
+
+        # what the response subject should be
+        if 'Subject' in message:
+            if subject[:4] != 'Re: '
+                subject = 'Re: '+message['Subject']
+            else:
+                subject = message['Subject']
+        else:
+            subject = 'OpenPGPBot response'
+
+        # todo: make a response template based on information in pgp_tester (#2)
+        body = 'This is an OpenPGPBot response!'
+
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-        msg = email.mime.text.MIMEText(body)
+        msg = MIMEText(body)
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = to_email
@@ -54,6 +80,7 @@ class EmailSender(object):
         s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
         s.sendmail(from_email, [to_email], msg.as_string())
         s.quit()
+        print 'Responded to {0}'.format(message['From'])
 
     def sign_body(self):
         # need to implement PGP/MIME to sign the body here
@@ -132,13 +159,18 @@ def main():
     pgp_tester = OpenPGPEmailParser()
     imap_conn, message_ids, messages = fetcher.get_all_mail()
     for message in messages:
-        print "received message: %s" % message['Subject']
         pgp_tester.set_new_email(message)
-        pgp_tester.is_pgp_email()
+
         if pgp_tester.properties['encrypted']:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
         if pgp_tester.properties['signed']:
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
+
+        # respond to the email
+        EmailSender(message, pgp_tester)
+
+        # delete the email
+
 
 
 if __name__ == "__main__":
