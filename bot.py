@@ -106,12 +106,22 @@ class EmailSender(object):
         # make a response template based on information in pgp_tester (#2)
         # todo: do this for plain txt emails too
         html_template = self.env.get_template('email_template.html')
-        html_template_vars = {'encrypted_html' : '<h1> Dan test: your email is encrypted!</h1><br>',
-                              'signed_html': '<h1> Dan test: your email is signed!</h1>'}
+
+        # todo: this if/else logic should be handled by templating
+        if self.pgp_tester.properties['encrypted']:
+            encrypted_html = '<h3 style="color:green"> Your email was encrypted <h3>'
+        else:
+            encrypted_html = '<h3 style="color:red"> Your email was NOT encrypted <h3>'
+        if self.pgp_tester.properties['signed']:
+            signed_html = '<h3 style="color:green"> Your email was signed <h3>'
+        else:
+            signed_html = '<h3 style="color:red"> Your email was NOT signed <h3>'
+
+        html_template_vars = {'encrypted_html' : encrypted_html,
+                              'signed_html': signed_html}
         html_body = html_template.render(html_template_vars)
 
-        txt_body = 'This is a OpenPGPBot txt response.'
-
+        txt_body = 'This is a OpenPGPBot txt response. Sorry only html works right now!'
 
         # support both html and plain text responses
         txt_part = MIMEText(txt_body, 'plain')
@@ -201,12 +211,10 @@ class OpenPGPEmailParser(object):
 
 
 def main():
-    # todo? use fancier version of jinja2
-    # e.g. 
+    # jinja2
     templateLoader = jinja2.FileSystemLoader(searchpath="templates")
     templateEnv = jinja2.Environment(loader=templateLoader)
-    #env = Environment(loader=PackageLoader('OpenPGPBot', 'templates'))
-
+    # email fetcher
     fetcher = EmailFetcher(maildir=config.MAILDIR)
     pgp_tester = OpenPGPEmailParser()
     message_ids, messages = fetcher.get_all_mail()
