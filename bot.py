@@ -3,11 +3,13 @@
 An email bot to help you learn OpenPGP!
 """
 
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import sys
 import imaplib, smtplib
 import email
-from email.mime.text import MIMEText
 import gnupg
+#import jinja2
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -92,13 +94,23 @@ class EmailSender(object):
             subject = 'OpenPGPBot response'
 
         # todo: make a response template based on information in pgp_tester (#2)
-        body = 'This is an OpenPGPBot response!'
+        txt_body = 'This is a OpenPGPBot txt response.'
+        html_body = '<html><body><h1>This is an OpenPGPBot html response!</h1></body></html>'
 
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-        msg = MIMEText(body)
+
+        # support both html and plain text responses
+        txt_part = MIMEText(txt_body, 'plain')
+        html_part = MIMEText(html_body, 'html')
+
+        msg = MIMEMultipart('alternative')
+
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = to_email
+    
+        msg.attach(txt_part)
+        msg.attach(html_part)
 
         s = smtplib.SMTP_SSL(config.SMTP_SERVER)
         s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
