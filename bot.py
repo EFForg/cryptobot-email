@@ -149,35 +149,10 @@ class EmailSender(object):
 class OpenPGPEmailParser(object):
     def __init__(self, gpg=None, email=None):
         if not gpg:
-            self.gpg = gnupg.GPG(homedir="bot_keyring")
+            self.gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
         else:
             self.gpg = gpg
         self.set_new_email(email)
-
-    # todo: reincorporate check_keypair where appropriate
-    def check_keypair(self):
-        gen_new_key = True
-        expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-        fingerprint = None
-
-        seckeys = self.gpg.list_keys(secret=True)
-        if len(seckeys):
-            for key in seckeys:
-                for uid in key['uids']:
-                    if str(uid) == expected_uid:
-                        fingerprint = str(key['fingerprint'])
-                        gen_new_key = False
-
-        if gen_new_key:
-            print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
-            gpg_input = self.gpg.gen_key_input(name_email=config.PGP_EMAIL, 
-                                          name_real=config.PGP_NAME, 
-                                          key_type='RSA',
-                                          key_length=4096)
-            key = self.gpg.gen_key(gpg_input)
-            fingerprint = str(key.fingerprint)
-        
-        return fingerprint
 
     def set_new_email(self, email):
         self.email = email
@@ -236,5 +211,29 @@ def main():
         #  http://gmailblog.blogspot.com/2008/10/new-in-labs-advanced-imap-controls.html )
         fetcher.delete(message.message_id)
 
+def check_bot_keypair():
+    """Make sure the bot has a keypair. If it doesn't, create one."""
+    gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+
+    expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
+    gen_new_key, fingerprint = True, None
+    for key in gpg.list_keys(secret=True):
+        for uid in key['uids']:
+            if str(uid) == expected_uid:
+                fingerprint = str(key['fingerprint'])
+                gen_new_key = False
+
+    if gen_new_key:
+        print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
+        gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL,
+                                      name_real=config.PGP_NAME,
+                                      key_type='RSA',
+                                      key_length=4096)
+        key = gpg.gen_key(gpg_input)
+        fingerprint = str(key.fingerprint)
+
+    return fingerprint
+
 if __name__ == "__main__":
+    check_bot_keypair()
     main()
