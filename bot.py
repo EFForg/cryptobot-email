@@ -3,6 +3,7 @@
 An email bot to help you learn OpenPGP!
 """
 
+from mailbox import Message
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sys
@@ -51,11 +52,10 @@ class EmailFetcher(object):
         message_ids = data[0].split()
         messages = []
         for message_id in message_ids:
-            # fetch the email body (RFC822) for the given ID
             result, data = self.imap_mail.uid('fetch', message_id, "(RFC822)")
-            # convert raw email body into EmailMessage
-            messages.append(email.message_from_string(data[0][1]))
-        return message_ids, messages
+            messages.append(OpenPGPMessage(message=data[0][1],
+                                           message_id=message_id))
+        return messages
 
     def get_all_mail(self):
         if self.maildir:
@@ -70,9 +70,8 @@ class EmailFetcher(object):
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
-    def __init__(self, message, pgp_tester, env):
+    def __init__(self, message, env):
         self.message = message
-        self.pgp_tester = pgp_tester
         self.env = env
         self.construct_and_send_email()
 
@@ -103,16 +102,16 @@ class EmailSender(object):
         msg['From'] = from_email
         msg['To'] = to_email
 
-        # make a response template based on information in pgp_tester (#2)
+        # make a response template based on information in OpenPGPMessage (#2)
         # todo: do this for plain txt emails too
         html_template = self.env.get_template('email_template.html')
 
         # todo: this if/else logic should be handled by templating
-        if self.pgp_tester.properties['encrypted']:
+        if self.message.encrypted:
             encrypted_html = '<h3 style="color:green"> Your email was encrypted <h3>'
         else:
             encrypted_html = '<h3 style="color:red"> Your email was NOT encrypted <h3>'
-        if self.pgp_tester.properties['signed']:
+        if self.message.signed:
             signed_html = '<h3 style="color:green"> Your email was signed <h3>'
         else:
             signed_html = '<h3 style="color:red"> Your email was NOT signed <h3>'
@@ -146,44 +145,54 @@ class EmailSender(object):
         # need to implement PGP/MIME to sign the body here
         pass
 
-class OpenPGPEmailParser(object):
-    def __init__(self, gpg=None, email=None):
+class OpenPGPMessage(Message):
+    """Email message with OpenPGP-specific properties"""
+
+    def __init__(self, message, message_id=None, gpg=None):
+        Message.__init__(self, message)
+        self._message_id = message_id
         if not gpg:
-            self.gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+            self._gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
         else:
-            self.gpg = gpg
-        self.set_new_email(email)
+            self._gpg = gpg
+        self._parse_for_openpgp()
 
-    def set_new_email(self, email):
-        self.email = email
-        self.properties = {}
-        self.is_pgp_email()
+    @property
+    def message_id(self):
+        return self._message_id
 
-    def is_pgp_email(self):
+    def _parse_for_openpgp(self):
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
-        if not self.email:
-            return
-        encrypted, signed = False, False
-        for part in self.email.walk():
+        self._encrypted, self._signed = False, False
+        for part in self.walk():
             if part.get_content_type() in ("text/plain", "text/html",
                     "application/pgp-signature", "application/octet-stream"):
                 payload = part.get_payload().strip()
                 if PGP_ARMOR_HEADER_MESSAGE in payload:
-                    encrypted = True
+                    self._encrypted = True
                     # try to decrypt
-                    self.decrypted_text = str(self.gpg.decrypt(payload))
+                    self._decrypted_text = str(self._gpg.decrypt(payload))
                 elif PGP_ARMOR_HEADER_SIGNATURE in payload:
-                    signed = True
+                    self._signed = True
                 else:
                     # TODO: might not be ASCII armored. Trial
                     # decryption/verification?
                     pass
-        self.properties['encrypted'] = encrypted
-        self.properties['signed'] = signed
 
+    @property
+    def encrypted(self):
+        return self._encrypted
+
+    @property
+    def signed(self):
+        return self._signed
+
+    @property
+    def decrypted_text(self):
+        return self._decrypted_text
 
 def main():
     # jinja2
@@ -191,20 +200,15 @@ def main():
     templateEnv = jinja2.Environment(loader=templateLoader)
     # email fetcher
     fetcher = EmailFetcher(maildir=config.MAILDIR)
-    pgp_tester = OpenPGPEmailParser()
-    message_ids, messages = fetcher.get_all_mail()
-    for i in xrange(len(message_ids)):
-        messages[i].message_id = message_ids[i]
+    messages = fetcher.get_all_mail()
     for message in messages:
-        pgp_tester.set_new_email(message)
-
-        if pgp_tester.properties['encrypted']:
+        if message.encrypted:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
-        if pgp_tester.properties['signed']:
+        if message.signed:
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
 
         # respond to the email
-        EmailSender(message, pgp_tester, templateEnv)
+        EmailSender(message, templateEnv)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it

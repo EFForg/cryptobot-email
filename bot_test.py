@@ -17,7 +17,6 @@ class BotTest(unittest.TestCase):
         self.gpg.import_keys(self.private_key)
         
         # set up tester
-        self.pgp_tester = bot.OpenPGPEmailParser(gpg=self.gpg)
         self.emails = {}
         for filename in ['encrypted_to_wrong_key', 'signed', 'unencrypted_thunderbird', 'encrypted_correctly']: 
             self.emails[filename] = email.message_from_string(open('test_emails/'+filename).read())
@@ -26,29 +25,33 @@ class BotTest(unittest.TestCase):
         pass
 
     def test_encrypted(self):
-        self.pgp_tester.set_new_email(self.emails['encrypted_to_wrong_key'])
-        self.assertTrue(self.pgp_tester.properties['encrypted'])
+        msg = bot.OpenPGPMessage(self.emails['encrypted_to_wrong_key'],
+                                 gpg=self.gpg)
+        self.assertTrue(msg.encrypted)
 
     def test_unencrypted(self):
-        self.pgp_tester.set_new_email(self.emails['unencrypted_thunderbird'])
-        self.assertFalse(self.pgp_tester.properties['encrypted'])
+        msg = bot.OpenPGPMessage(self.emails['unencrypted_thunderbird'],
+                                 gpg=self.gpg)
+        self.assertFalse(msg.encrypted)
 
     def test_signed(self):
-        self.pgp_tester.set_new_email(self.emails['signed'])
-        self.assertTrue(self.pgp_tester.properties['signed'])
+        msg = bot.OpenPGPMessage(self.emails['signed'],
+                                 gpg=self.gpg)
+        self.assertTrue(msg.signed)
         
     def test_unsigned(self):
-        self.pgp_tester.set_new_email(self.emails['signed'])
-        self.assertTrue(self.pgp_tester.properties['signed'])
+        # todo finish
+        pass
 
     def test_encrypted_wrong_key(self):
         # tododta fill this out
         pass
 
     def test_encrypted_correct_key(self):
-        self.pgp_tester.set_new_email(self.emails['encrypted_correctly'])
         result_text = "encrypted text"
-        self.assertEquals(result_text, self.pgp_tester.decrypted_text.split("quoted-printable")[1].strip())
+        msg = bot.OpenPGPMessage(self.emails['encrypted_correctly'],
+                                 gpg=self.gpg)
+        self.assertEquals(result_text, msg.decrypted_text.split("quoted-printable")[1].strip())
 
 
 if __name__ == '__main__':
