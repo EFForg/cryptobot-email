@@ -11,6 +11,7 @@ Set all of these settings:
 
 - `PGP_NAME`: The name part of the user ID for for the bot's OpenPGP keypair
 - `PGP_EMAIL`: The email part of the user ID for for the bot's OpenPGP keypair. This should be the email address that users are expected to email.
+- `GPG_HOMEDIR`: The directory in which the bot's keyring will be stored (it will be created by the bot if it does not exist). This should be in a location that is writeable by the bot.
 - `IMAP_SERVER`: The IMAP server to connect to, e.g. `imap.gmail.com`
 - `IMAP_USERNAME`: The IMAP username
 - `IMAP_PASSWORD`: The IMAP password
