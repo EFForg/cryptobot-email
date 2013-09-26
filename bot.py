@@ -3,7 +3,7 @@
 An email bot to help you learn OpenPGP!
 """
 
-from mailbox import Message
+from mailbox import Message, Maildir
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sys
@@ -36,12 +36,16 @@ class EmailFetcher(object):
         self.imap_mail = imaplib.IMAP4_SSL(imap_server)
         self.imap_mail.login(username, password)
 
-    def get_maildir_directly(self):
+    def get_maildir_mail(self):
         # todo: improve this function and make return values consistent
-        import mailbox
-        mailbox.Maildir.colon = '!'
-        md = mailbox.Maildir(config.MAILDIR)
-        return None, None, [email.message_from_string(str(msg)) for msg in md.values()]
+        Maildir.colon = '!'
+        md = Maildir(config.MAILDIR)
+        emails = []
+        for key, message in md.iteritems():
+            print 'Message is {0}'.format(message)
+            emails.append(OpenPGPMessage(str(message), key))
+            md.discard(key)
+        return emails
 
     def get_imap_mail(self):
         self.imap_mail.select("inbox")
@@ -59,7 +63,7 @@ class EmailFetcher(object):
 
     def get_all_mail(self):
         if self.maildir:
-            return self.get_maildir_directly()
+            return self.get_maildir_mail()
         else:
             return self.get_imap_mail()
 
@@ -131,8 +135,11 @@ class EmailSender(object):
         self.send_email(msg, from_email, to_email)
 
     def send_email(self, msg, from_email, to_email):
-        s = smtplib.SMTP_SSL(config.SMTP_SERVER)
-        s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
+        if config.SMTP_SERVER == 'localhost':
+            s = smtplib.SMTP(config.SMTP_SERVER)
+        else:
+            s = smtplib.SMTP_SSL(config.SMTP_SERVER)
+            s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
         s.sendmail(from_email, [to_email], msg.as_string())
         s.quit()
         print 'Responded to {0}'.format(self.message['From'])
@@ -168,6 +175,9 @@ class OpenPGPMessage(Message):
         # 2. ASCII armored and non-armored emails
         self._encrypted, self._signed = False, False
         for part in self.walk():
+            # tododta remove; debugging
+            #print "part is {0}".format(str(part))
+            #print "part.get_content_type() is {0}".format(str(part.get_content_type()))
             if part.get_content_type() in ("text/plain", "text/html",
                     "application/pgp-signature", "application/octet-stream"):
                 payload = part.get_payload().strip()
@@ -199,7 +209,7 @@ def main():
     templateLoader = jinja2.FileSystemLoader(searchpath="templates")
     templateEnv = jinja2.Environment(loader=templateLoader)
     # email fetcher
-    fetcher = EmailFetcher(maildir=config.MAILDIR)
+    fetcher = EmailFetcher(maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
     for message in messages:
         if message.encrypted:
@@ -235,6 +245,7 @@ def check_bot_keypair():
                                       key_length=4096)
         key = gpg.gen_key(gpg_input)
         fingerprint = str(key.fingerprint)
+        print 'Finished generating keypair. Fingerprint is: {0}'.format(fingerprint)
 
     return fingerprint
 
