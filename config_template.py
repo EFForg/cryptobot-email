@@ -8,7 +8,7 @@ GPG_HOMEDIR = "bot_keyring"
 # you can either use a maildir or you can use IMAP
 # set MAILDIR to False to use IMAP, otherwise set it to a path
 USE_MAILDIR = False
-MAILDIR = ""x
+MAILDIR = ""
 
 # IMAP server (only SSL on the default port is supported)
 IMAP_SERVER = ""
