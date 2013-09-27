@@ -6,7 +6,7 @@ An email bot to help you learn OpenPGP!
 from mailbox import Message, Maildir
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import sys
+import sys, os
 import imaplib, smtplib
 import email
 import gnupg
@@ -22,14 +22,14 @@ except ImportError:
     sys.exit(1)
 
 class EmailFetcher(object):
-    def __init__(self, maildir=False):
-        self.maildir = maildir
+    def __init__(self, use_maildir=False):
+        self.use_maildir = use_maildir
 
-        if not self.maildir:
+        if not self.use_maildir:
             self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
 
     def __del__(self):
-        if not self.maildir:
+        if not self.use_maildir:
             self.imap_mail.expunge()
 
     def login(self, username, password, imap_server):
@@ -37,14 +37,22 @@ class EmailFetcher(object):
         self.imap_mail.login(username, password)
 
     def get_maildir_mail(self):
-        # todo: improve this function and make return values consistent
-        Maildir.colon = '!'
-        md = Maildir(config.MAILDIR)
+        # Note: there is an issue where if isinstance(msg, rfc822.Message)
+        # then str(msg) does not print the full message. Hence trying
+        # to use Maildir to import Messages, then get their string representations
+        # to import into OpenPGPMessage failed, as did importing directly
+        # since OpenPGP message expects a string. Instead we use os.walk to 
+        # get Maildir files directly
         emails = []
-        for key, message in md.iteritems():
-            print 'Message is {0}'.format(message)
-            emails.append(OpenPGPMessage(str(message), key))
-            md.discard(key)
+        for file_path in os.walk(config.MAILDIR):
+            for f in file_path[2]:
+                if (f.endswith('openpgpbot')):
+                    # this is a new email, and a horrible hack
+                    # todo: more elegantly get file path
+                    full_file_path = os.path.join(config.MAILDIR, 'new', f)
+                    emails.append(OpenPGPMessage(open(full_file_path).read(), f.split('.')[0]))
+                    os.remove(full_file_path)
+        # todo delete email!
         return emails
 
     def get_imap_mail(self):
@@ -62,13 +70,13 @@ class EmailFetcher(object):
         return messages
 
     def get_all_mail(self):
-        if self.maildir:
+        if self.use_maildir:
             return self.get_maildir_mail()
         else:
             return self.get_imap_mail()
 
     def delete(self, message_id):
-        if self.maildir:
+        if self.use_maildir:
             pass
         else:
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
@@ -175,9 +183,6 @@ class OpenPGPMessage(Message):
         # 2. ASCII armored and non-armored emails
         self._encrypted, self._signed = False, False
         for part in self.walk():
-            # tododta remove; debugging
-            #print "part is {0}".format(str(part))
-            #print "part.get_content_type() is {0}".format(str(part.get_content_type()))
             if part.get_content_type() in ("text/plain", "text/html",
                     "application/pgp-signature", "application/octet-stream"):
                 payload = part.get_payload().strip()
@@ -209,7 +214,7 @@ def main():
     templateLoader = jinja2.FileSystemLoader(searchpath="templates")
     templateEnv = jinja2.Environment(loader=templateLoader)
     # email fetcher
-    fetcher = EmailFetcher(maildir=config.USE_MAILDIR)
+    fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
     for message in messages:
         if message.encrypted:
