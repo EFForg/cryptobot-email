@@ -1,5 +1,5 @@
-OpenPGPBot
-==========
+CryptoBot Email
+===============
 
 ## Getting Started
 
