@@ -37,11 +37,11 @@ class EmailFetcher(object):
         self.imap_mail.login(username, password)
 
     def get_maildir_mail(self):
-        # Note: there is an issue where if isinstance(msg, rfc822.Message)
+        # Note: there is an issue where if msg is rfc822.Message,
         # then str(msg) does not print the full message. Hence trying
         # to use Maildir to import Messages, then get their string representations
         # to import into OpenPGPMessage failed, as did importing directly
-        # since OpenPGP message expects a string. Instead we use os.walk to 
+        # since OpenPGPMessage expects a string. Instead we use os.walk to 
         # get Maildir files directly
         emails = []
         for file_path in os.walk(config.MAILDIR):
@@ -176,26 +176,41 @@ class OpenPGPMessage(Message):
     def message_id(self):
         return self._message_id
 
+    def _find_email_payload_matches(self, content_types, payload_test):
+        matches = []
+        for part in self.walk():
+            if part.get_content_type() in content_types:
+                payload = part.get_payload().strip()
+                if payload_test in payload:
+                    matches.append(payload)
+        return matches
+
     def _parse_for_openpgp(self):
         # XXX: rough heuristic. This is probably quite nuanced among different
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
         self._encrypted, self._signed = False, False
-        for part in self.walk():
-            if part.get_content_type() in ("text/plain", "text/html",
-                    "application/pgp-signature", "application/octet-stream"):
-                payload = part.get_payload().strip()
-                if PGP_ARMOR_HEADER_MESSAGE in payload:
-                    self._encrypted = True
-                    # try to decrypt
-                    self._decrypted_text = str(self._gpg.decrypt(payload))
-                elif PGP_ARMOR_HEADER_SIGNATURE in payload:
-                    self._signed = True
-                else:
-                    # TODO: might not be ASCII armored. Trial
-                    # decryption/verification?
-                    pass
+        content_types = ["text/plain", "text/html",
+                         "application/pgp-signature", "application/octet-stream"]
+        encrypted_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_MESSAGE)
+        if encrypted_parts:
+            if len(encrypted_parts) > 1:
+                # todo: raise error here?
+                print "More than one encrypted part in this message. That's weird..."
+            self._encrypted = True
+            self._full_decrypted_text = self._gpg.decrypt(encrypted_parts[0])
+             # todo: check signatures in decrypted text
+            self._decrypted_text = str(self._full_decrypted_text)
+        signed_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_SIGNATURE)
+        if signed_parts:
+            if len(signed_parts) > 1:
+                # todo: raise error here?
+                print "More than one signed part in this message. That's weird..."
+            self._signed = True
+            # todo: check signature, public key attached, etc
+        # TODO: might not be ASCII armored. Trial
+        # decryption/verification?
 
     @property
     def encrypted(self):

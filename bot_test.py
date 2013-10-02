@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import unittest
 import bot
 import email
@@ -18,7 +19,7 @@ class BotTest(unittest.TestCase):
         
         # set up tester
         self.emails = {}
-        for filename in ['encrypted_to_wrong_key', 'signed', 'unencrypted_thunderbird', 'encrypted_correctly']: 
+        for filename in os.listdir('test_emails/'):
             self.emails[filename] = email.message_from_string(open('test_emails/'+filename).read())
 
     def tearDown(self):
@@ -52,6 +53,12 @@ class BotTest(unittest.TestCase):
         msg = bot.OpenPGPMessage(self.emails['encrypted_correctly'],
                                  gpg=self.gpg)
         self.assertEquals(result_text, msg.decrypted_text.split("quoted-printable")[1].strip())
+
+    def test_encrypted_and_signed_pgp_mime(self):
+        result_text = "this message is encrypted and signed and uses pgp/mime"
+        msg = bot.OpenPGPMessage(self.emails['encrypted_signed_pgp_mime'], gpg=self.gpg)
+        self.assertTrue(msg.decrypted_text.find(result_text) > 0)
+        self.assertTrue(msg.signed)
 
 
 if __name__ == '__main__':
