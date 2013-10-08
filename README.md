@@ -1,7 +1,9 @@
-![CryptoBot](https://raw.github.com/EFForg/cryptobot-email/master/doc/images/cryptobot.png)
-
 CryptoBot Email
 ===============
+
+![CryptoBot](https://raw.github.com/EFForg/cryptobot-email/master/doc/images/cryptobot-large.png)
+
+CryptoBot Email is an email bot that helps people learn how to use OpenPGP. You send CryptoBot a PGP-encrypted and signed email (probably using GnuPG) and it responds telling you how you do, and offering advice.
 
 ## Getting Started
 
