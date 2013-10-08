@@ -1,4 +1,4 @@
-![CryptoBot](https://raw.github.com/EFForg/cryptobot-email/blob/master/doc/images/cryptobot.png)
+![CryptoBot](https://raw.github.com/EFForg/cryptobot-email/master/doc/images/cryptobot.png)
 
 CryptoBot Email
 ===============
