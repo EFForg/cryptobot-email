@@ -11,11 +11,11 @@ email encryption interface.
 {% if encrypted %}
 GOOD: Your email was encrypted.
 {% else %}
-WARNING: Your email was not encrypted.
+WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.
 {% endif %}
 
 {% if signed %}
 GOOD: Your email was signed.
 {% else %}
-WARNING: Your email was not signed.
+WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from {{from_email}}. An attacker can't spoof an OpenPGP signature.
 {% endif %}

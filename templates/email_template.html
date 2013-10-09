@@ -5,15 +5,15 @@
     <p><strong>Greetings, human. You are interacting with the CryptoBot human-computer email encryption interface.</strong></p>
   
     {% if encrypted %}
-    <p style="color:#009900;">Your email was encrypted.</p>
+    <p style="color:#009900;">GOOD: Your email was encrypted.</p>
     {% else %}
-    <p style="color:#990000;">Your email was not encrypted.</p>
+    <p style="color:#990000;">WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key.</p>
     {% endif %}
 
     {% if signed %}
-    <p style="color:#009900;">Your email was signed.</p>
+    <p style="color:#009900;">GOOD: Your email was signed.</p>
     {% else %}
-    <p style="color:#990000;">Your email was not signed.</p>
+    <p style="color:#990000;">WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from {{from_email}}. An attacker can't spoof an OpenPGP signature.</p>
     {% endif %}
   </body>
 </html>
