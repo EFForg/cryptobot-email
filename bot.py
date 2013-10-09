@@ -106,21 +106,22 @@ class EmailSender(object):
             if self.message['Subject'][:4] != 'Re: ':
                 subject = 'Re: '+self.message['Subject']
             else:
-                subject = message['Subject']
+                subject = self.message['Subject']
         else:
             subject = 'OpenPGPBot response'
 
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
 
-        msg = MIMEMultipart('alternative')
+        msg = MIMEMultipart('mixed')
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = to_email
 
+        body = MIMEMultipart('alternative')
+
         # make a response template based on information in OpenPGPMessage (#2)
         html_template = self.env.get_template('email_template.html')
         txt_template = self.env.get_template('email_template.txt')
-
         template_vars = {}
         template_vars['encrypted'] = self.message.encrypted
         template_vars['signed'] = self.message.signed
@@ -129,17 +130,18 @@ class EmailSender(object):
         txt_part = MIMEText(txt_template.render(template_vars), 'plain')
         html_part = MIMEText(html_template.render(template_vars), 'html')
     
-        msg.attach(txt_part)
-        msg.attach(html_part)
+        body.attach(txt_part)
+        body.attach(html_part)
+        msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
         if not self.message.encrypted:
             gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
             pubkey = str(gpg.export_keys(self.fp))
-            pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, self.fp[:-8])
+            pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fp)[:-8])
 
-            pubkey_part = MIMEText(pubkey, 'plain')
-            #pubkey_part.add_header('Content-Transfer-Encoding', 'quoted-printable')
+            pubkey_part = MIMEBase('application', 'pgp-keys')
+            pubkey_part.set_payload(pubkey)
             pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
             msg.attach(pubkey_part)
 
