@@ -1,7 +1,19 @@
 <html>
-  <head></head>
   <body>
-    {{ encrypted_html }}
-    {{ signed_html }}
+    <p><img src="https://raw.github.com/EFForg/cryptobot-email/master/doc/images/cryptobot-small.png" /></p>
+
+    <p><strong>Greetings, human. You are interacting with the CryptoBot human-computer email encryption interface.</strong></p>
+  
+    {% if encrypted %}
+    <p style="color:#009900;">Your email was encrypted.</p>
+    {% else %}
+    <p style="color:#990000;">Your email was not encrypted.</p>
+    {% endif %}
+
+    {% if signed %}
+    <p style="color:#009900;">Your email was signed.</p>
+    {% else %}
+    <p style="color:#990000;">Your email was not signed.</p>
+    {% endif %}
   </body>
 </html>

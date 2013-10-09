@@ -115,28 +115,16 @@ class EmailSender(object):
         msg['To'] = to_email
 
         # make a response template based on information in OpenPGPMessage (#2)
-        # todo: do this for plain txt emails too
         html_template = self.env.get_template('email_template.html')
+        txt_template = self.env.get_template('email_template.txt')
 
-        # todo: this if/else logic should be handled by templating
-        if self.message.encrypted:
-            encrypted_html = '<h3 style="color:green"> Your email was encrypted <h3>'
-        else:
-            encrypted_html = '<h3 style="color:red"> Your email was NOT encrypted <h3>'
-        if self.message.signed:
-            signed_html = '<h3 style="color:green"> Your email was signed <h3>'
-        else:
-            signed_html = '<h3 style="color:red"> Your email was NOT signed <h3>'
-
-        html_template_vars = {'encrypted_html' : encrypted_html,
-                              'signed_html': signed_html}
-        html_body = html_template.render(html_template_vars)
-
-        txt_body = 'This is a OpenPGPBot txt response. Sorry only html works right now!'
+        template_vars = {}
+        template_vars['encrypted'] = self.message.encrypted
+        template_vars['signed'] = self.message.signed
 
         # support both html and plain text responses
-        txt_part = MIMEText(txt_body, 'plain')
-        html_part = MIMEText(html_body, 'html')
+        txt_part = MIMEText(txt_template.render(template_vars), 'plain')
+        html_part = MIMEText(html_template.render(template_vars), 'html')
     
         msg.attach(txt_part)
         msg.attach(html_part)
@@ -226,8 +214,8 @@ class OpenPGPMessage(Message):
 
 def main():
     # jinja2
-    templateLoader = jinja2.FileSystemLoader(searchpath="templates")
-    templateEnv = jinja2.Environment(loader=templateLoader)
+    template_loader = jinja2.FileSystemLoader(searchpath="templates")
+    template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
     # email fetcher
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
@@ -238,7 +226,7 @@ def main():
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
 
         # respond to the email
-        EmailSender(message, templateEnv)
+        EmailSender(message, template_env)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it

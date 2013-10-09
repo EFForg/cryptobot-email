@@ -1,0 +1,21 @@
+   ______                 __        ____        __ 
+  / ____/______  ______  / /_____  / __ )____  / /_
+ / /   / ___/ / / / __ \/ __/ __ \/ __  / __ \/ __/
+/ /___/ /  / /_/ / /_/ / /_/ /_/ / /_/ / /_/ / /_  
+\____/_/   \__, / .___/\__/\____/_____/\____/\__/  
+          /____/_/                                 
+
+Greetings, human. You are interacting with the CryptoBot human-computer
+email encryption interface.
+
+{% if encrypted %}
+GOOD: Your email was encrypted.
+{% else %}
+WARNING: Your email was not encrypted.
+{% endif %}
+
+{% if signed %}
+GOOD: Your email was signed.
+{% else %}
+WARNING: Your email was not signed.
+{% endif %}
