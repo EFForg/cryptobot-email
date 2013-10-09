@@ -4,8 +4,10 @@ An email bot to help you learn OpenPGP!
 """
 
 from mailbox import Message, Maildir
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
 import sys, os
 import imaplib, smtplib
 import email
@@ -82,9 +84,10 @@ class EmailFetcher(object):
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
-    def __init__(self, message, env):
+    def __init__(self, message, env, fp):
         self.message = message
         self.env = env
+        self.fp = fp
         self.construct_and_send_email()
 
     def construct_and_send_email(self):
@@ -128,6 +131,18 @@ class EmailSender(object):
     
         msg.attach(txt_part)
         msg.attach(html_part)
+
+        # if the message is not encrypted, attach public key (#16)
+        if not self.message.encrypted:
+            gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+            pubkey = str(gpg.export_keys(self.fp))
+            pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, self.fp[:-8])
+
+            pubkey_part = MIMEText(pubkey, 'plain')
+            #pubkey_part.add_header('Content-Transfer-Encoding', 'quoted-printable')
+            pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
+            msg.attach(pubkey_part)
+
         self.send_email(msg, from_email, to_email)
 
     def send_email(self, msg, from_email, to_email):
@@ -212,10 +227,11 @@ class OpenPGPMessage(Message):
     def decrypted_text(self):
         return self._decrypted_text
 
-def main():
+def main(fp):
     # jinja2
     template_loader = jinja2.FileSystemLoader(searchpath="templates")
     template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
+
     # email fetcher
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
@@ -226,7 +242,7 @@ def main():
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
 
         # respond to the email
-        EmailSender(message, template_env)
+        EmailSender(message, template_env, fp)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
@@ -258,5 +274,5 @@ def check_bot_keypair():
     return fingerprint
 
 if __name__ == "__main__":
-    check_bot_keypair()
-    main()
+    fp = check_bot_keypair()
+    main(fp)

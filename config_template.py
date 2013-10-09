@@ -1,5 +1,5 @@
 # Bot's OpenPGP keypair user ID
-PGP_NAME = "OpenPGP Bot"
+PGP_NAME = "CryptoBot Email"
 PGP_EMAIL = ""
 
 # Directory where the bot's GPG keyring is stored
