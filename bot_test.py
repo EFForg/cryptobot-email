@@ -62,6 +62,32 @@ class BotTest(unittest.TestCase):
         self.assertTrue(msg.decrypted_text.find(result_text) > 0)
         self.assertTrue(msg.signed)
 
+    def test_pubkey_included_attached_text_plain(self):
+        msg = bot.OpenPGPMessage(self.emails['pubkey_attached_text-plain'], gpg=self.gpg)
+        self.assertTrue(msg.pubkey_included)
+    
+    def test_pubkey_included_attached_application_pgpkeys(self):
+        msg = bot.OpenPGPMessage(self.emails['pubkey_attached_application-pgpkeys'], gpg=self.gpg)
+        self.assertTrue(msg.pubkey_included)
+
+    def test_pubkey_included_inline(self):
+        msg = bot.OpenPGPMessage(self.emails['pubkey_inline'], gpg=self.gpg)
+        self.assertTrue(msg.pubkey_included)
+
+    def test_encrypted_pubkey_included_attached_text_plain(self):
+        msg = bot.OpenPGPMessage(self.emails['encrypted_pubkey_attached_text-plain'], gpg=self.gpg)
+        self.assertTrue(msg.encrypted_right)
+        self.assertTrue(msg.pubkey_included)
+    
+    def test_encrypted_pubkey_included_attached_application_pgpkeys(self):
+        msg = bot.OpenPGPMessage(self.emails['encrypted_pubkey_attached_application-pgpkeys'], gpg=self.gpg)
+        self.assertTrue(msg.encrypted_right)
+        self.assertTrue(msg.pubkey_included)
+
+    def test_encrypted_pubkey_included_inline(self):
+        msg = bot.OpenPGPMessage(self.emails['encrypted_pubkey_inline'], gpg=self.gpg)
+        self.assertTrue(msg.encrypted_right)
+        self.assertTrue(msg.pubkey_included)
 
 if __name__ == '__main__':
     unittest.main()

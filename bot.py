@@ -194,7 +194,7 @@ class OpenPGPMessage(Message):
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
-        self._encrypted_right, self._encrypted_wrong, self._signed = False, False, False
+        self._encrypted_right, self._encrypted_wrong, self._signed, self._pubkey_included = False, False, False, False
         content_types = ["text/plain", "text/html",
                          "application/pgp-signature", "application/octet-stream"]
         encrypted_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_MESSAGE)
@@ -234,6 +234,10 @@ class OpenPGPMessage(Message):
     @property
     def decrypted_text(self):
         return self._decrypted_text
+
+    @property
+    def pubkey_included(self):
+        return self._pubkey_included
 
 def main(fp):
     # jinja2
