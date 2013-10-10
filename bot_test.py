@@ -57,6 +57,8 @@ class BotTest(unittest.TestCase):
     def test_encrypted_and_signed_pgp_mime(self):
         result_text = "this message is encrypted and signed and uses pgp/mime"
         msg = bot.OpenPGPMessage(self.emails['encrypted_signed_pgp_mime'], gpg=self.gpg)
+        self.assertTrue(msg.encrypted_right)
+        self.assertFalse(msg.encrypted_wrong)
         self.assertTrue(msg.decrypted_text.find(result_text) > 0)
         self.assertTrue(msg.signed)
 
