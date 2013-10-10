@@ -88,6 +88,10 @@ class EmailSender(object):
         self.message = message
         self.env = env
         self.fp = fp
+        
+        self.html_template = self.env.get_template('email_template.html')
+        self.txt_template = self.env.get_template('email_template.txt')
+
         self.construct_and_send_email()
 
     def construct_and_send_email(self):
@@ -120,18 +124,12 @@ class EmailSender(object):
         body = MIMEMultipart('alternative')
 
         # make a response template based on information in OpenPGPMessage (#2)
-        html_template = self.env.get_template('email_template.html')
-        txt_template = self.env.get_template('email_template.txt')
-        template_vars = {}
-        template_vars['encrypted'] = self.message.encrypted
-        template_vars['signed'] = self.message.signed
-
-        # support both html and plain text responses
-        txt_part = MIMEText(txt_template.render(template_vars), 'plain')
-        html_part = MIMEText(html_template.render(template_vars), 'html')
-    
-        body.attach(txt_part)
-        body.attach(html_part)
+        template_vars = {
+            'encrypted': self.message.encrypted,
+            'signed': self.message.signed
+        }
+        body.attach(MIMEText(self.txt_template.render(template_vars), 'plain'))
+        body.attach(MIMEText(self.html_template.render(template_vars), 'html'))
         msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
