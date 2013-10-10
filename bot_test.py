@@ -25,15 +25,11 @@ class BotTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_encrypted(self):
-        msg = bot.OpenPGPMessage(self.emails['encrypted_to_wrong_key'],
-                                 gpg=self.gpg)
-        self.assertTrue(msg.encrypted)
-
     def test_unencrypted(self):
         msg = bot.OpenPGPMessage(self.emails['unencrypted_thunderbird'],
                                  gpg=self.gpg)
-        self.assertFalse(msg.encrypted)
+        self.assertFalse(msg.encrypted_right)
+        self.assertFalse(msg.encrypted_wrong)
 
     def test_signed(self):
         msg = bot.OpenPGPMessage(self.emails['signed'],
@@ -44,15 +40,19 @@ class BotTest(unittest.TestCase):
         # todo finish
         pass
 
-    def test_encrypted_wrong_key(self):
-        # tododta fill this out
-        pass
-
     def test_encrypted_correct_key(self):
         result_text = "encrypted text"
         msg = bot.OpenPGPMessage(self.emails['encrypted_correctly'],
                                  gpg=self.gpg)
+        self.assertTrue(msg.encrypted_right)
+        self.assertFalse(msg.encrypted_wrong)
         self.assertEquals(result_text, msg.decrypted_text.split("quoted-printable")[1].strip())
+    
+    def test_encrypted_wrong_key(self):
+        msg = bot.OpenPGPMessage(self.emails['encrypted_to_wrong_key'],
+                                 gpg=self.gpg)
+        self.assertFalse(msg.encrypted_right)
+        self.assertTrue(msg.encrypted_wrong)
 
     def test_encrypted_and_signed_pgp_mime(self):
         result_text = "this message is encrypted and signed and uses pgp/mime"
