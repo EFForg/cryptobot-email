@@ -125,7 +125,8 @@ class EmailSender(object):
 
         # make a response template based on information in OpenPGPMessage (#2)
         template_vars = {
-            'encrypted': self.message.encrypted,
+            'encrypted_right': self.message.encrypted_right,
+            'encrypted_wrong': self.message.encrypted_wrong,
             'signed': self.message.signed
         }
         body.attach(MIMEText(self.txt_template.render(template_vars), 'plain'))
@@ -133,7 +134,7 @@ class EmailSender(object):
         msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
-        if not self.message.encrypted:
+        if not self.message.encrypted_right:
             gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
             pubkey = str(gpg.export_keys(self.fp))
             pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fp)[:-8])
@@ -193,7 +194,7 @@ class OpenPGPMessage(Message):
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
-        self._encrypted, self._signed = False, False
+        self._encrypted_right, self._encrypted_wrong, self._signed = False, False, False
         content_types = ["text/plain", "text/html",
                          "application/pgp-signature", "application/octet-stream"]
         encrypted_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_MESSAGE)
@@ -201,9 +202,12 @@ class OpenPGPMessage(Message):
             if len(encrypted_parts) > 1:
                 # todo: raise error here?
                 print "More than one encrypted part in this message. That's weird..."
-            self._encrypted = True
             self._full_decrypted_text = self._gpg.decrypt(encrypted_parts[0])
-             # todo: check signatures in decrypted text
+            if self._full_decrypted_text.status == 'decryption failed':
+                self._encrypted_wrong = True
+            elif self._full_decrypted_text.status == 'decryption ok':
+                self._encrypted_right = True
+            # todo: check signatures in decrypted text
             self._decrypted_text = str(self._full_decrypted_text)
         signed_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_SIGNATURE)
         if signed_parts:
@@ -216,8 +220,12 @@ class OpenPGPMessage(Message):
         # decryption/verification?
 
     @property
-    def encrypted(self):
-        return self._encrypted
+    def encrypted_right(self):
+        return self._encrypted_right
+    
+    @property
+    def encrypted_wrong(self):
+        return self._encrypted_wrong
 
     @property
     def signed(self):
@@ -236,8 +244,10 @@ def main(fp):
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
     for message in messages:
-        if message.encrypted:
+        if message.encrypted_right:
             print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
+        if message.encrypted_wrong:
+            print '"%s" from %s is encrypted to the wrong key' % (message['Subject'], message['From'])
         if message.signed:
             print '"%s" from %s is signed' % (message['Subject'], message['From'])
 
@@ -247,7 +257,7 @@ def main(fp):
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
         #  http://gmailblog.blogspot.com/2008/10/new-in-labs-advanced-imap-controls.html )
-        fetcher.delete(message.message_id)
+        #fetcher.delete(message.message_id)
 
 def check_bot_keypair():
     """Make sure the bot has a keypair. If it doesn't, create one."""

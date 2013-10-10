@@ -8,8 +8,10 @@
 Greetings, human. You are interacting with the CryptoBot human-computer
 email encryption interface.
 
-{% if encrypted %}
+{% if encrypted_right %}
 GOOD: Your email was encrypted. It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)
+{% elif encrypted_wrong %}
+WARNING: Your email was encrypted, but I couldn't decrypt it. It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.
 {% else %}
 WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.
 {% endif %}
