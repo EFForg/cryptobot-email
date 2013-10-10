@@ -257,7 +257,7 @@ def main(fp):
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
         #  http://gmailblog.blogspot.com/2008/10/new-in-labs-advanced-imap-controls.html )
-        #fetcher.delete(message.message_id)
+        fetcher.delete(message.message_id)
 
 def check_bot_keypair():
     """Make sure the bot has a keypair. If it doesn't, create one."""
