@@ -9,13 +9,13 @@ Greetings, human. You are interacting with the CryptoBot human-computer
 email encryption interface.
 
 {% if encrypted %}
-GOOD: Your email was encrypted.
+GOOD: Your email was encrypted. It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)
 {% else %}
 WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.
 {% endif %}
 
 {% if signed %}
-GOOD: Your email was signed.
+GOOD: Your email was signed. I can be pretty sure it really came from you and nobody changed the text of what you wrote.
 {% else %}
-WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from {{from_email}}. An attacker can't spoof an OpenPGP signature.
+WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be sure that it really came from you, and nobody changed the text of what you wrote.
 {% endif %}
