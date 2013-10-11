@@ -8,7 +8,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-import sys, os
+import sys, os, re
 import imaplib, smtplib
 import email
 import gnupg
@@ -16,6 +16,7 @@ import jinja2
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
+PGP_ARMOR_HEADER_PUBKEY    = "-----BEGIN PGP PUBLIC KEY BLOCK-----"
 
 try:
     import config
@@ -194,9 +195,17 @@ class OpenPGPMessage(Message):
         # clients.
         # 1. Multipart and non-multipart emails
         # 2. ASCII armored and non-armored emails
-        self._encrypted_right, self._encrypted_wrong, self._signed, self._pubkey_included = False, False, False, False
-        content_types = ["text/plain", "text/html",
-                         "application/pgp-signature", "application/octet-stream"]
+        
+        self._encrypted_right       = False
+        self._encrypted_wrong       = False
+        self._signed                = False
+        self._pubkey_included       = False
+        self._pubkey_included_wrong = False
+        
+        content_types = ["text/plain", "text/html", 
+            "application/pgp-signature", "application/pgp-keys", 
+            "application/octet-stream"]
+        
         encrypted_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_MESSAGE)
         if encrypted_parts:
             if len(encrypted_parts) > 1:
@@ -209,6 +218,7 @@ class OpenPGPMessage(Message):
                 self._encrypted_right = True
             # todo: check signatures in decrypted text
             self._decrypted_text = str(self._full_decrypted_text)
+        
         signed_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_SIGNATURE)
         if signed_parts:
             if len(signed_parts) > 1:
@@ -216,8 +226,48 @@ class OpenPGPMessage(Message):
                 print "More than one signed part in this message. That's weird..."
             self._signed = True
             # todo: check signature, public key attached, etc
+        
+        pubkey_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_PUBKEY)
+        if pubkey_parts:
+            # find all the pubkeys
+            pubkeys = []
+            for part in pubkey_parts:
+                pubkeys += self.find_pubkeys(part)
+
+            # looks pubkey is included, try importing
+            if len(pubkeys) > 0:
+                fingerprints = []
+                for pubkey in pubkeys:
+                    result = self._gpg.import_keys(pubkey)
+                    fingerprints += result.fingerprints
+                fingerprints = list(set(fingerprints))
+                if len(fingerprints) == 0:
+                    self._pubkey_included_wrong = True
+                else:
+                    # todo: make sure there's at least one key with the same user id as the message From
+                    # and make sure the response gets encrypted to that key
+                    pass
+       
         # TODO: might not be ASCII armored. Trial
         # decryption/verification?
+
+    def find_pubkeys(self, s):
+        pubkeys = []
+
+        in_block = False
+        pubkey = ""
+        for line in s.split('\n'):
+            line = line.rstrip()
+            if line == "-----BEGIN PGP PUBLIC KEY BLOCK-----":
+                in_block = True
+            if in_block:
+                pubkey += line + "\n"
+            if line == "-----END PGP PUBLIC KEY BLOCK-----":
+                in_block = False
+                pubkeys.append(pubkey)
+                pubkey = ""
+        
+        return pubkeys
 
     @property
     def encrypted_right(self):
