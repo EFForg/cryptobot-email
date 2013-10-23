@@ -13,6 +13,8 @@ import imaplib, smtplib
 import email
 import gnupg
 import jinja2
+import rfc822
+import hashlib
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -201,6 +203,7 @@ class OpenPGPMessage(Message):
         self._signed                = False
         self._pubkey_included       = False
         self._pubkey_included_wrong = False
+        self._pubkey_fingerprint    = False
         
         content_types = ["text/plain", "text/html", 
             "application/pgp-signature", "application/pgp-keys", 
@@ -235,18 +238,47 @@ class OpenPGPMessage(Message):
                 pubkeys += self.find_pubkeys(part)
 
             # looks pubkey is included, try importing
+            print '\n'
             if len(pubkeys) > 0:
                 fingerprints = []
                 for pubkey in pubkeys:
+                    print '[] Importing pubkey '+pubkey
+                    print '[] Number of keys: '+str(len(self._gpg.list_keys()))
                     result = self._gpg.import_keys(pubkey)
+                    print '[] Imported key, fingerprints: '+str(result.fingerprints)
                     fingerprints += result.fingerprints
+                    print '[] Number of keys: '+str(len(self._gpg.list_keys()))
                 fingerprints = list(set(fingerprints))
                 if len(fingerprints) == 0:
                     self._pubkey_included_wrong = True
                 else:
-                    # todo: make sure there's at least one key with the same user id as the message From
-                    # and make sure the response gets encrypted to that key
-                    pass
+                    # looks like we have a key, make sure there's a valid user id
+                    name, email_addr = rfc822.parseaddr(self.get('From'))
+
+                    local_pubkeys = self._gpg.list_keys()
+                    valid_fingerprint = False
+
+                    for fingerprint in fingerprints:
+                        print '[] Looking at fingerprint: '+fingerprint
+                        valid_uid = False
+                        for local_pubkey in local_pubkeys:
+                            if local_pubkey['fingerprint'] == fingerprint:
+                                print '[] Found key in keyring, search UIDs for '+email_addr+' now'
+                                for uid in local_pubkey['uids']:
+                                    if email_addr in uid:
+                                        print '[] Found matching uid: '+uid
+                                        valid_uid = True
+                                        break
+                                break
+                        
+                        if valid_uid:
+                            valid_fingerprint = fingerprint
+                            break
+
+                    if valid_fingerprint:
+                        self._pubkey_included = True
+                        self._pubkey_fingerprint = valid_fingerprint
+            print '\n'
        
         # TODO: might not be ASCII armored. Trial
         # decryption/verification?
