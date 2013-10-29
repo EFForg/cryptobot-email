@@ -17,5 +17,7 @@
     {% else %}
     <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.</p>
     {% endif %}
+
+    <p>Your fingerprint: {{pubkey_fingerprint}}</p>
   </body>
 </html>

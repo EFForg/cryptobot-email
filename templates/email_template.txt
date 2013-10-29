@@ -21,3 +21,5 @@ GOOD: Your email was signed. I can be pretty sure it really came from you and no
 {% else %}
 WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.
 {% endif %}
+
+Your fingerprint: {{pubkey_fingerprint}}

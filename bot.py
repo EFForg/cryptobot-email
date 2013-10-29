@@ -8,13 +8,12 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-import sys, os, re
+import sys, os, re, subprocess
 import imaplib, smtplib
 import email
 import gnupg
 import jinja2
 import rfc822
-import hashlib
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -130,7 +129,10 @@ class EmailSender(object):
         template_vars = {
             'encrypted_right': self.message.encrypted_right,
             'encrypted_wrong': self.message.encrypted_wrong,
-            'signed': self.message.signed
+            'signed': self.message.signed,
+            'pubkey_included': self.message.pubkey_included,
+            'pubkey_included_wrong': self.message.pubkey_included_wrong,
+            'pubkey_fingerprint': self.message.pubkey_fingerprint
         }
         body.attach(MIMEText(self.txt_template.render(template_vars), 'plain'))
         body.attach(MIMEText(self.html_template.render(template_vars), 'html'))
@@ -235,20 +237,16 @@ class OpenPGPMessage(Message):
             # find all the pubkeys
             pubkeys = []
             for part in pubkey_parts:
-                pubkeys += self.find_pubkeys(part)
+                pubkeys += self._find_pubkeys(part)
 
             # looks pubkey is included, try importing
-            print '\n'
             if len(pubkeys) > 0:
                 fingerprints = []
                 for pubkey in pubkeys:
-                    print '[] Importing pubkey '+pubkey
-                    print '[] Number of keys: '+str(len(self._gpg.list_keys()))
                     result = self._gpg.import_keys(pubkey)
-                    print '[] Imported key, fingerprints: '+str(result.fingerprints)
                     fingerprints += result.fingerprints
-                    print '[] Number of keys: '+str(len(self._gpg.list_keys()))
                 fingerprints = list(set(fingerprints))
+                
                 if len(fingerprints) == 0:
                     self._pubkey_included_wrong = True
                 else:
@@ -259,14 +257,11 @@ class OpenPGPMessage(Message):
                     valid_fingerprint = False
 
                     for fingerprint in fingerprints:
-                        print '[] Looking at fingerprint: '+fingerprint
                         valid_uid = False
                         for local_pubkey in local_pubkeys:
                             if local_pubkey['fingerprint'] == fingerprint:
-                                print '[] Found key in keyring, search UIDs for '+email_addr+' now'
                                 for uid in local_pubkey['uids']:
                                     if email_addr in uid:
-                                        print '[] Found matching uid: '+uid
                                         valid_uid = True
                                         break
                                 break
@@ -275,15 +270,14 @@ class OpenPGPMessage(Message):
                             valid_fingerprint = fingerprint
                             break
 
-                    if valid_fingerprint:
+                    if valid_fingerprint != False:
                         self._pubkey_included = True
                         self._pubkey_fingerprint = valid_fingerprint
-            print '\n'
        
         # TODO: might not be ASCII armored. Trial
         # decryption/verification?
 
-    def find_pubkeys(self, s):
+    def _find_pubkeys(self, s):
         pubkeys = []
 
         in_block = False
@@ -320,6 +314,14 @@ class OpenPGPMessage(Message):
     @property
     def pubkey_included(self):
         return self._pubkey_included
+    
+    @property
+    def pubkey_included_wrong(self):
+        return self._pubkey_included_wrong
+    
+    @property
+    def pubkey_fingerprint(self):
+        return self._pubkey_fingerprint
 
 def main(fp):
     # jinja2
