@@ -347,8 +347,8 @@ def main(fp):
         #  http://gmailblog.blogspot.com/2008/10/new-in-labs-advanced-imap-controls.html )
         fetcher.delete(message.message_id)
 
-def check_bot_keypair():
-    """Make sure the bot has a keypair. If it doesn't, create one."""
+def check_bot_keypair(allow_new_key):
+    """Make sure the bot has a keypair. If it doesn't, create one if allow_new_key is true."""
     gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
 
     expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
@@ -360,17 +360,29 @@ def check_bot_keypair():
                 gen_new_key = False
 
     if gen_new_key:
-        print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
-        gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL,
-                                      name_real=config.PGP_NAME,
-                                      key_type='RSA',
-                                      key_length=4096)
-        key = gpg.gen_key(gpg_input)
-        fingerprint = str(key.fingerprint)
-        print 'Finished generating keypair. Fingerprint is: {0}'.format(fingerprint)
+        if allow_new_key:
+            print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
+            gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL,
+                                          name_real=config.PGP_NAME,
+                                          key_type='RSA',
+                                          key_length=4096)
+            key = gpg.gen_key(gpg_input)
+            fingerprint = str(key.fingerprint)
+            print 'Finished generating keypair. Fingerprint is: {0}'.format(fingerprint)
+        else:
+            raise ValueError, "Could not find keypair for cryptobot"
 
     return fingerprint
 
 if __name__ == "__main__":
-    fp = check_bot_keypair()
+    import argparse
+    parser = argparse.ArgumentParser(description="Cryptobot arg parser")
+    parser.add_argument('--generate-new-key',dest='allow_new_key',action='store_true')
+    parser.add_argument('--no-generate-new-key',dest='allow_new_key',action='store_false')
+    parser.set_defaults(allow_new_key=False)
+    args = parser.parse_args()
+
+    print args.allow_new_key
+
+    fp = check_bot_keypair(args.allow_new_key)
     main(fp)
