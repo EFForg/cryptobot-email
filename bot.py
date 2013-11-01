@@ -39,7 +39,19 @@ class GnuPG(object):
     
     def import_keys(self, pubkey):
         """Imports a public key block and returns a fingerprint, or False of invalid pubkey"""
-        return False
+
+        # figure out the fingerprint of the key
+        fingerprint = False
+        output = self._gpg(['--with-fingerprint'], pubkey)
+        for line in output.split('\n'):
+            if 'Key fingerprint = ' in line:
+                fingerprint = line.strip().lstrip('Key fingerprint = ').replace(' ', '')
+        if not fingerprint:
+            return False
+
+        # import the key
+        self._gpg(['--import'], pubkey)
+        return fingerprint
 
     def decrypt(self, ciphertext):
         """Attempts to decrypt ciphertext block, returns plaintext or False if decryption fails"""
@@ -57,12 +69,12 @@ class GnuPG(object):
         """Generate a key, returns its fingerprint"""
         return False
 
-    def _gpg(self, args):
+    def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
         p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()
-
-        return p.stdout.read()
+        
+        stdoutdata, stderrdata = p.communicate(input)
+        return stdoutdata
 
 class EmailFetcher(object):
     def __init__(self, use_maildir=False):
