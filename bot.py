@@ -71,6 +71,11 @@ class GnuPG(object):
 
     def has_secret_key_with_uid(self, uid):
         """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
+        out, err = self._gpg(['--list-secret-keys', '--with-colons'])
+        for line in out.split('\n'):
+            if line[0:3] == 'sec' or line[0:3] == 'uid':
+                if uid in line:
+                    return True
         return False
 
     def gen_key(self, name, email, key_length=4096):
