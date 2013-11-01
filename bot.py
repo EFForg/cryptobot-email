@@ -283,9 +283,9 @@ class OpenPGPMessage(Message):
                 # todo: raise error here?
                 print "More than one encrypted part in this message. That's weird..."
             self._full_decrypted_text = self._gpg.decrypt(encrypted_parts[0])
-            if self._full_decrypted_text.status == 'decryption failed':
+            if not self._full_decrypted_text:
                 self._encrypted_wrong = True
-            elif self._full_decrypted_text.status == 'decryption ok':
+            else:
                 self._encrypted_right = True
             # todo: check signatures in decrypted text
             self._decrypted_text = str(self._full_decrypted_text)
