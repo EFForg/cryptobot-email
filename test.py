@@ -30,6 +30,7 @@ class GnuPGTest(unittest.TestCase):
     def test_import_keys_valid(self):
         rms_pubkey = open('test_key/rms.asc').read()
         fingerprint = self.gpg.import_keys(rms_pubkey)
+        self.assertTrue(fingerprint)
         self.assertEqual(fingerprint.upper(), '6F818B215E159EF3FA26B0BE624DC565135EA668')
     
     def test_import_keys_invalid(self):
@@ -37,18 +38,19 @@ class GnuPGTest(unittest.TestCase):
         self.assertFalse(fingerprint)
 
     def test_decrypt_valid(self):
-        ciphertext = open('test_keys/test_decrypt_valid.asc').read()
+        ciphertext = open('test_key/test_decrypt_valid.asc').read()
         plaintext = self.gpg.decrypt(ciphertext)
         self.assertEqual(plaintext, 'This is a test message.')
     
     def test_decrypt_invalid(self):
-        ciphertext = open('test_keys/test_decrypt_invalid.asc').read()
+        ciphertext = open('test_key/test_decrypt_invalid.asc').read()
         plaintext = self.gpg.decrypt(ciphertext)
         self.assertFalse(plaintext)
     
     def test_encrypt(self):
         ciphertext = self.gpg.encrypt('test', '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387')
-        self.assertIn(bot.PGP_ARMOR_HEADER_MESSAGE, ciphertext)
+        self.assertFalse(ciphertext == False)
+        self.assertTrue(bot.PGP_ARMOR_HEADER_MESSAGE in ciphertext)
     
     def test_has_secret_key_with_uid(self):
         expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
