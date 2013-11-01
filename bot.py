@@ -8,7 +8,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-import sys, os
+import sys, os, subprocess
 import imaplib, smtplib
 import email
 import jinja2
@@ -31,7 +31,11 @@ class GnuPG(object):
 
     def export_keys(self, fingerprint):
         """Returns an ascii armorer public key block, or False"""
-        return False
+        pubkey = self._gpg(['--armor', '--no-emit-version', '--export', fingerprint])
+        if pubkey == 'gpg: WARNING: nothing exported\n':
+            return False
+        else:
+            return pubkey
     
     def import_keys(self, pubkey):
         """Imports a public key block and returns a fingerprint, or False of invalid pubkey"""
@@ -50,8 +54,15 @@ class GnuPG(object):
         return False
 
     def gen_key(self, name, email, key_length=4096):
-        """Generate a key"""
+        """Generate a key, returns its fingerprint"""
         return False
+
+    def _gpg(self, args):
+        gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
+        p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p.wait()
+
+        return p.stdout.read()
 
 class EmailFetcher(object):
     def __init__(self, use_maildir=False):
