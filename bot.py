@@ -11,7 +11,6 @@ from email.mime.multipart import MIMEMultipart
 import sys, os
 import imaplib, smtplib
 import email
-import gnupg
 import jinja2
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
@@ -22,6 +21,37 @@ try:
 except ImportError:
     print >> sys.stderr, "Error: could not load configuration from config.py"
     sys.exit(1)
+
+class GnuPG(object):
+    def __init__(self, homedir=False):
+        if not homedir:
+            self.homedir = config.GPG_HOMEDIR
+        else:
+            self.homedir = homedir
+
+    def export_keys(self, fingerprint):
+        """Returns an ascii armorer public key block, or False"""
+        return False
+    
+    def import_keys(self, pubkey):
+        """Imports a public key block and returns a fingerprint, or False of invalid pubkey"""
+        return False
+
+    def decrypt(self, ciphertext):
+        """Attempts to decrypt ciphertext block, returns plaintext or False if decryption fails"""
+        return False
+    
+    def encrypt(self, plaintext, fingerprint):
+        """Encrypts plaintext, returns ciphertext"""
+        return False
+
+    def has_secret_key_with_uid(self, uid):
+        """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
+        return False
+
+    def gen_key(self, name, email, key_length=4096):
+        """Generate a key"""
+        return False
 
 class EmailFetcher(object):
     def __init__(self, use_maildir=False):
@@ -135,7 +165,7 @@ class EmailSender(object):
 
         # if the message is not encrypted, attach public key (#16)
         if not self.message.encrypted_right:
-            gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+            gpg = GnuPG()
             pubkey = str(gpg.export_keys(self.fp))
             pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fp)[:-8])
 
@@ -171,7 +201,7 @@ class OpenPGPMessage(Message):
         Message.__init__(self, message)
         self._message_id = message_id
         if not gpg:
-            self._gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+            self._gpg = GnuPG()
         else:
             self._gpg = gpg
         self._parse_for_openpgp()
@@ -265,25 +295,15 @@ def main(fp):
 
 def check_bot_keypair(allow_new_key):
     """Make sure the bot has a keypair. If it doesn't, create one if allow_new_key is true."""
-    gpg = gnupg.GPG(homedir=config.GPG_HOMEDIR)
+    gpg = GnuPG()
 
     expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-    gen_new_key, fingerprint = True, None
-    for key in gpg.list_keys(secret=True):
-        for uid in key['uids']:
-            if str(uid) == expected_uid:
-                fingerprint = str(key['fingerprint'])
-                gen_new_key = False
-
-    if gen_new_key:
+    
+    fingerprint = gpg.has_secret_key_with_uid(expected_uid)
+    if not fingerprint:
         if allow_new_key:
             print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
-            gpg_input = gpg.gen_key_input(name_email=config.PGP_EMAIL,
-                                          name_real=config.PGP_NAME,
-                                          key_type='RSA',
-                                          key_length=4096)
-            key = gpg.gen_key(gpg_input)
-            fingerprint = str(key.fingerprint)
+            fingerprint = gpg.gen_key(config.PGP_NAME, config.PGP_EMAIL)
             print 'Finished generating keypair. Fingerprint is: {0}'.format(fingerprint)
         else:
             raise ValueError, "Could not find keypair for cryptobot"
