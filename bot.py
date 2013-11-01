@@ -341,20 +341,12 @@ class OpenPGPMessage(Message):
                 else:
                     # looks like we have a key, make sure there's a valid user id
                     name, email_addr = rfc822.parseaddr(self.get('From'))
-
-                    local_pubkeys = self._gpg.list_keys()
                     valid_fingerprint = False
-
                     for fingerprint in fingerprints:
                         valid_uid = False
-                        for local_pubkey in local_pubkeys:
-                            if local_pubkey['fingerprint'] == fingerprint:
-                                for uid in local_pubkey['uids']:
-                                    if email_addr in uid:
-                                        valid_uid = True
-                                        break
-                                break
-                        
+                        if self._gpg.has_public_key_with_uid(fingerprint, email):
+                            valid_uid = True
+
                         if valid_uid:
                             valid_fingerprint = fingerprint
                             break
@@ -362,9 +354,6 @@ class OpenPGPMessage(Message):
                     if valid_fingerprint != False:
                         self._pubkey_included = True
                         self._pubkey_fingerprint = valid_fingerprint
-       
-        # TODO: might not be ASCII armored. Trial
-        # decryption/verification?
 
     def _find_pubkeys(self, s):
         pubkeys = []
