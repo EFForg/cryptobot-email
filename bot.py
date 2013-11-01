@@ -31,19 +31,19 @@ class GnuPG(object):
 
     def export_keys(self, fingerprint):
         """Returns an ascii armorer public key block, or False"""
-        pubkey = self._gpg(['--armor', '--no-emit-version', '--export', fingerprint])
-        if pubkey == 'gpg: WARNING: nothing exported\n':
+        out, err = self._gpg(['--armor', '--no-emit-version', '--export', fingerprint])
+        if out == 'gpg: WARNING: nothing exported\n':
             return False
         else:
-            return pubkey
+            return out
     
     def import_keys(self, pubkey):
         """Imports a public key block and returns a fingerprint, or False of invalid pubkey"""
 
         # figure out the fingerprint of the key
         fingerprint = False
-        output = self._gpg(['--with-fingerprint'], pubkey)
-        for line in output.split('\n'):
+        out, err = self._gpg(['--with-fingerprint'], pubkey)
+        for line in out.split('\n'):
             if 'Key fingerprint = ' in line:
                 fingerprint = line.strip().lstrip('Key fingerprint = ').replace(' ', '')
         if not fingerprint:
@@ -55,7 +55,10 @@ class GnuPG(object):
 
     def decrypt(self, ciphertext):
         """Attempts to decrypt ciphertext block, returns plaintext or False if decryption fails"""
-        return False
+        out, err = self._gpg(['--decrypt'], ciphertext)
+        if 'secret key not available' in err:
+            return False
+        return out
     
     def encrypt(self, plaintext, fingerprint):
         """Encrypts plaintext, returns ciphertext"""
@@ -71,10 +74,9 @@ class GnuPG(object):
 
     def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
-        p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        stdoutdata, stderrdata = p.communicate(input)
-        return stdoutdata
+        return p.communicate(input)
 
 class EmailFetcher(object):
     def __init__(self, use_maildir=False):
