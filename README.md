@@ -36,7 +36,7 @@ virtualenv:
 
 To run the tests:
 
-    $ ./bot_test.py
+    $ ./test.py
 
 1. [OpenPGP RFC 4880](http://tools.ietf.org/html/rfc4880)
 2. [MIME RFC 2045](http://tools.ietf.org/html/rfc2045)

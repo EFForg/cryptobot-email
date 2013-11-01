@@ -4,7 +4,66 @@ import os
 import unittest
 import bot
 import email
-import gnupg
+import random
+
+class GnuPGTest(unittest.TestCase):
+    def setUp(self):
+        # test keys
+        self.public_key = open('test_key/public.key').read()
+        self.private_key = open('test_key/private.key').read()
+        # set up test keyring
+        self.gpg = bot.GnuPG("test_bot_keyring")
+        self.gpg.import_keys(self.public_key)
+        self.gpg.import_keys(self.private_key)
+
+    def tearDown(self):
+        pass
+
+    def test_export_keys_valid(self):
+        pubkey = self.gpg.export_keys('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387')
+        self.assertEqual(pubkey, self.public_key)
+    
+    def test_export_keys_invalid(self):
+        pubkey = self.gpg.export_keys('0000000000000000000000000000000000000000')
+        self.assertFalse(pubkey)
+
+    def test_import_keys_valid(self):
+        rms_pubkey = open('test_key/rms.asc').read()
+        fingerprint = self.gpg.import_keys(rms_pubkey)
+        self.assertTrue(fingerprint)
+        self.assertEqual(fingerprint.upper(), '6F818B215E159EF3FA26B0BE624DC565135EA668')
+    
+    def test_import_keys_invalid(self):
+        fingerprint = self.gpg.import_keys('fail')
+        self.assertFalse(fingerprint)
+
+    def test_decrypt_valid(self):
+        ciphertext = open('test_key/test_decrypt_valid.asc').read()
+        plaintext = self.gpg.decrypt(ciphertext)
+        self.assertEqual(plaintext, 'This is a test message.\n')
+    
+    def test_decrypt_invalid(self):
+        ciphertext = open('test_key/test_decrypt_invalid.asc').read()
+        plaintext = self.gpg.decrypt(ciphertext)
+        self.assertFalse(plaintext)
+    
+    def test_encrypt(self):
+        ciphertext = self.gpg.encrypt('test', '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387')
+        self.assertFalse(ciphertext == False)
+        self.assertTrue(bot.PGP_ARMOR_HEADER_MESSAGE in ciphertext)
+    
+    def test_has_secret_key_with_uid(self):
+        expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
+        self.assertTrue(self.gpg.has_secret_key_with_uid(expected_uid))
+        self.assertFalse(self.gpg.has_secret_key_with_uid('fluff'))
+    
+    def test_gen_key(self):
+        random.seed()
+        r = random.random()
+        name = 'Test '+str(r)
+        expected_uid = name+' <test@example.com>'
+        fingerprint = self.gpg.gen_key(name, 'test@example.com', 1024)
+        self.assertTrue(self.gpg.has_secret_key_with_uid(expected_uid))
 
 class BotTest(unittest.TestCase):
 
@@ -13,7 +72,7 @@ class BotTest(unittest.TestCase):
         self.public_key = open('test_key/public.key').read()
         self.private_key = open('test_key/private.key').read()
         # set up test keyring
-        self.gpg = gnupg.GPG(homedir="test_bot_keyring")
+        self.gpg = bot.GnuPG("test_bot_keyring")
         self.gpg.import_keys(self.public_key)
         self.gpg.import_keys(self.private_key)
         
