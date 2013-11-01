@@ -56,6 +56,11 @@ class GnuPGTest(unittest.TestCase):
         expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
         self.assertTrue(self.gpg.has_secret_key_with_uid(expected_uid))
         self.assertFalse(self.gpg.has_secret_key_with_uid('fluff'))
+
+    def test_has_public_key_with_uid(self):
+        expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
+        self.assertTrue(self.gpg.has_public_key_with_uid('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', expected_uid))
+        self.assertFalse(self.gpg.has_public_key_with_uid('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', 'fluff'))
     
     def test_gen_key(self):
         random.seed()

@@ -80,6 +80,9 @@ class GnuPG(object):
                     return True
         return False
 
+    def has_public_key_with_uid(self, fingerprint, uid):
+        """Searches public key with fingerprint for uid and returns True if found, otherwise returns False"""
+
     def gen_key(self, name, email, key_length=4096):
         """Generate a key, returns its key ID"""
         
@@ -323,8 +326,8 @@ class OpenPGPMessage(Message):
             if len(pubkeys) > 0:
                 fingerprints = []
                 for pubkey in pubkeys:
-                    result = self._gpg.import_keys(pubkey)
-                    fingerprints += result.fingerprints
+                    fingerprint = self._gpg.import_keys(pubkey)
+                    fingerprints.append(fingerprint)
                 fingerprints = list(set(fingerprints))
                 
                 if len(fingerprints) == 0:
