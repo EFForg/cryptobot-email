@@ -79,8 +79,23 @@ class GnuPG(object):
         return False
 
     def gen_key(self, name, email, key_length=4096):
-        """Generate a key, returns its fingerprint"""
-        return False
+        """Generate a key, returns its key ID"""
+        
+        # make input variable to pass into gpg
+        input  = "Key-Type: RSA\n"
+        input += "Key-Length: "+str(key_length)+"\n"
+        input += "Name-Real: "+name+"\n"
+        input += "Name-Email: "+email+"\n"
+        input += "%commit\n"
+
+        out, err = self._gpg(['--gen-key', '--batch', '--no-tty'], input)
+
+        # it doesn't seem to be easy to get the full fingerprint, but return the key ID at least
+        keyid = False
+        for line in err:
+            if 'marked as ultimately trusted' in line:
+                keyid = line.strip().lstrip('gpg: key ').rstrip(' marked as ultimately trusted')
+        return keyid
 
     def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
