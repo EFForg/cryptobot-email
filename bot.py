@@ -82,6 +82,12 @@ class GnuPG(object):
 
     def has_public_key_with_uid(self, fingerprint, uid):
         """Searches public key with fingerprint for uid and returns True if found, otherwise returns False"""
+        out, err = self._gpg(['--list-keys', '--with-colons', fingerprint])
+        for line in out.split('\n'):
+            if line[0:3] == 'pub' or line[0:3] == 'uid':
+                if uid in line:
+                    return True
+        return False
 
     def gen_key(self, name, email, key_length=4096):
         """Generate a key, returns its key ID"""
