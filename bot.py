@@ -62,7 +62,12 @@ class GnuPG(object):
     
     def encrypt(self, plaintext, fingerprint):
         """Encrypts plaintext, returns ciphertext"""
-        return False
+        out, err = self._gpg(['--armor', '--batch', '--trust-model', 'always', '--encrypt', '--recipient', fingerprint], plaintext)
+
+        if 'encryption failed' in err:
+            return False
+
+        return out
 
     def has_secret_key_with_uid(self, uid):
         """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
