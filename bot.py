@@ -56,11 +56,14 @@ class GnuPG(object):
         return fingerprint
 
     def decrypt(self, ciphertext):
-        """Attempts to decrypt ciphertext block, returns plaintext or False if decryption fails"""
+        """Attempts to decrypt ciphertext block, returns type (plaintext, signed (bool)) or False if decryption fails"""
         out, err = self._gpg(['--decrypt'], ciphertext)
+        
         if 'secret key not available' in err:
-            return False
-        return out
+            return False, False
+        
+        signed = 'Good signature from' in err
+        return out, signed
     
     def encrypt(self, plaintext, fingerprint):
         """Encrypts plaintext, returns ciphertext"""
@@ -307,12 +310,15 @@ class OpenPGPMessage(Message):
             if len(encrypted_parts) > 1:
                 # todo: raise error here?
                 print "More than one encrypted part in this message. That's weird..."
-            self._decrypted_text = self._gpg.decrypt(encrypted_parts[0])
+            self._decrypted_text, signed = self._gpg.decrypt(encrypted_parts[0])
             if not self._decrypted_text:
                 self._encrypted_wrong = True
             else:
                 self._encrypted_right = True
                 self._parts.append( ('text/plain', self._decrypted_text) )
+
+                if signed:
+                    self._signed = True
         
         signed_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_SIGNATURE)
         if signed_parts:

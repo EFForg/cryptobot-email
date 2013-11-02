@@ -39,12 +39,12 @@ class GnuPGTest(unittest.TestCase):
 
     def test_decrypt_valid(self):
         ciphertext = open('test_key/test_decrypt_valid.asc').read()
-        plaintext = self.gpg.decrypt(ciphertext)
+        plaintext, signed = self.gpg.decrypt(ciphertext)
         self.assertEqual(plaintext, 'This is a test message.\n')
     
     def test_decrypt_invalid(self):
         ciphertext = open('test_key/test_decrypt_invalid.asc').read()
-        plaintext = self.gpg.decrypt(ciphertext)
+        plaintext, signed = self.gpg.decrypt(ciphertext)
         self.assertFalse(plaintext)
     
     def test_encrypt(self):
