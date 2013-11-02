@@ -111,8 +111,8 @@ class GnuPG(object):
     def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
         p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
-        return p.communicate(input)
+        out, err = p.communicate(input)
+        return out, err
 
 class EmailFetcher(object):
     def __init__(self, use_maildir=False):
@@ -344,7 +344,7 @@ class OpenPGPMessage(Message):
                     valid_fingerprint = False
                     for fingerprint in fingerprints:
                         valid_uid = False
-                        if self._gpg.has_public_key_with_uid(fingerprint, email):
+                        if self._gpg.has_public_key_with_uid(fingerprint, email_addr):
                             valid_uid = True
 
                         if valid_uid:
