@@ -42,5 +42,5 @@ env/
 
 # Project-specific
 config.py
-bot_keyring/
-test_bot_keyring/
+test/homedir/
+homedir/

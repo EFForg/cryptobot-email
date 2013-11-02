@@ -9,10 +9,10 @@ import random
 class GnuPGTest(unittest.TestCase):
     def setUp(self):
         # test keys
-        self.public_key = open('test_key/public.key').read()
-        self.private_key = open('test_key/private.key').read()
+        self.public_key = open('test/keys/public.key').read()
+        self.private_key = open('test/keys/private.key').read()
         # set up test keyring
-        self.gpg = bot.GnuPG("test_bot_keyring")
+        self.gpg = bot.GnuPG("test/homedir")
         self.gpg.import_keys(self.public_key)
         self.gpg.import_keys(self.private_key)
 
@@ -28,7 +28,7 @@ class GnuPGTest(unittest.TestCase):
         self.assertFalse(pubkey)
 
     def test_import_keys_valid(self):
-        rms_pubkey = open('test_key/rms.asc').read()
+        rms_pubkey = open('test/keys/rms.asc').read()
         fingerprint = self.gpg.import_keys(rms_pubkey)
         self.assertTrue(fingerprint)
         self.assertEqual(fingerprint.upper(), '6F818B215E159EF3FA26B0BE624DC565135EA668')
@@ -38,12 +38,12 @@ class GnuPGTest(unittest.TestCase):
         self.assertFalse(fingerprint)
 
     def test_decrypt_valid(self):
-        ciphertext = open('test_key/test_decrypt_valid.asc').read()
+        ciphertext = open('test/keys/test_decrypt_valid.asc').read()
         plaintext, signed = self.gpg.decrypt(ciphertext)
         self.assertEqual(plaintext, 'This is a test message.\n')
     
     def test_decrypt_invalid(self):
-        ciphertext = open('test_key/test_decrypt_invalid.asc').read()
+        ciphertext = open('test/keys/test_decrypt_invalid.asc').read()
         plaintext, signed = self.gpg.decrypt(ciphertext)
         self.assertFalse(plaintext)
     
@@ -74,17 +74,17 @@ class BotTest(unittest.TestCase):
 
     def setUp(self):
         # test keys
-        self.public_key = open('test_key/public.key').read()
-        self.private_key = open('test_key/private.key').read()
+        self.public_key = open('test/keys/public.key').read()
+        self.private_key = open('test/keys/private.key').read()
         # set up test keyring
-        self.gpg = bot.GnuPG("test_bot_keyring")
+        self.gpg = bot.GnuPG("test/homedir")
         self.gpg.import_keys(self.public_key)
         self.gpg.import_keys(self.private_key)
         
         # set up tester
         self.emails = {}
-        for filename in os.listdir('test_emails/'):
-            self.emails[filename] = email.message_from_string(open('test_emails/'+filename).read())
+        for filename in os.listdir('test/emails/'):
+            self.emails[filename] = email.message_from_string(open('test/emails/'+filename).read())
 
     def tearDown(self):
         pass
