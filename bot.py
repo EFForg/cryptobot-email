@@ -13,6 +13,7 @@ import imaplib, smtplib
 import email
 import jinja2
 import rfc822
+import quopri
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -51,7 +52,7 @@ class GnuPG(object):
             return False
 
         # import the key
-        self._gpg(['--import'], pubkey)
+        out, err = self._gpg(['--import'], pubkey)
         return fingerprint
 
     def decrypt(self, ciphertext):
@@ -109,6 +110,7 @@ class GnuPG(object):
 
     def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
+        print gpg_args
         p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate(input)
         return out, err
@@ -277,7 +279,7 @@ class OpenPGPMessage(Message):
         matches = []
         for part in self.walk():
             if part.get_content_type() in content_types:
-                payload = part.get_payload().strip()
+                payload = quopri.decodestring(part.get_payload().strip())
                 if payload_test in payload:
                     matches.append(payload)
         return matches
