@@ -110,7 +110,6 @@ class GnuPG(object):
 
     def _gpg(self, args, input=None):
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
-        print gpg_args
         p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate(input)
         return out, err
