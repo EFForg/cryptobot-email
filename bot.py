@@ -26,10 +26,9 @@ except ImportError:
 
 class GnuPG(object):
     def __init__(self, homedir=False):
-        if not homedir:
-            self.homedir = config.GPG_HOMEDIR
-        else:
-            self.homedir = homedir
+        self.homedir = homedir or config.GPG_HOMEDIR
+        if not os.path.exists(self.homedir):
+            os.mkdir(self.homedir, 0700)
 
     def export_keys(self, fingerprint):
         """Returns an ascii armorer public key block, or False"""
