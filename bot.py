@@ -268,52 +268,53 @@ class OpenPGPMessage(Message):
             self._gpg = GnuPG()
         else:
             self._gpg = gpg
+
+        self._content_types = ["text/plain", "text/html", 
+            "application/pgp-signature", "application/pgp-keys", 
+            "application/octet-stream"]
+
+        self._parts = []
+        for part in self.walk():
+            content_type = part.get_content_type()
+            if content_type in self._content_types:
+                payload = quopri.decodestring(part.get_payload().strip())
+                self._parts.append( (content_type, payload) )
+
         self._parse_for_openpgp()
 
     @property
     def message_id(self):
         return self._message_id
 
-    def _find_email_payload_matches(self, content_types, payload_test):
+    def _find_email_payload_matches(self, payload_test):
         matches = []
-        for part in self.walk():
-            if part.get_content_type() in content_types:
-                payload = quopri.decodestring(part.get_payload().strip())
+        for content_type, payload in self._parts:
+            if content_type in self._content_types:
                 if payload_test in payload:
                     matches.append(payload)
         return matches
 
     def _parse_for_openpgp(self):
-        # XXX: rough heuristic. This is probably quite nuanced among different
-        # clients.
-        # 1. Multipart and non-multipart emails
-        # 2. ASCII armored and non-armored emails
-        
         self._encrypted_right       = False
         self._encrypted_wrong       = False
         self._signed                = False
         self._pubkey_included       = False
         self._pubkey_included_wrong = False
         self._pubkey_fingerprint    = False
-        
-        content_types = ["text/plain", "text/html", 
-            "application/pgp-signature", "application/pgp-keys", 
-            "application/octet-stream"]
-        
-        encrypted_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_MESSAGE)
+         
+        encrypted_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_MESSAGE)
         if encrypted_parts:
             if len(encrypted_parts) > 1:
                 # todo: raise error here?
                 print "More than one encrypted part in this message. That's weird..."
-            self._full_decrypted_text = self._gpg.decrypt(encrypted_parts[0])
-            if not self._full_decrypted_text:
+            self._decrypted_text = self._gpg.decrypt(encrypted_parts[0])
+            if not self._decrypted_text:
                 self._encrypted_wrong = True
             else:
                 self._encrypted_right = True
-            # todo: check signatures in decrypted text
-            self._decrypted_text = str(self._full_decrypted_text)
+                self._parts.append( ('text/plain', self._decrypted_text) )
         
-        signed_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_SIGNATURE)
+        signed_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_SIGNATURE)
         if signed_parts:
             if len(signed_parts) > 1:
                 # todo: raise error here?
@@ -321,7 +322,7 @@ class OpenPGPMessage(Message):
             self._signed = True
             # todo: check signature, public key attached, etc
         
-        pubkey_parts = self._find_email_payload_matches(content_types, PGP_ARMOR_HEADER_PUBKEY)
+        pubkey_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_PUBKEY)
         if pubkey_parts:
             # find all the pubkeys
             pubkeys = []
