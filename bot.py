@@ -457,7 +457,5 @@ if __name__ == "__main__":
     parser.set_defaults(allow_new_key=False)
     args = parser.parse_args()
 
-    print args.allow_new_key
-
     fp = check_bot_keypair(args.allow_new_key)
     main(fp)
