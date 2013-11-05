@@ -53,8 +53,8 @@ class GnuPGTest(unittest.TestCase):
         self.assertTrue(bot.PGP_ARMOR_HEADER_MESSAGE in ciphertext)
     
     def test_has_secret_key_with_uid(self):
-        expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
-        self.assertTrue(self.gpg.has_secret_key_with_uid(expected_uid))
+        self.assertEqual('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', self.gpg.has_secret_key_with_uid('OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'))
+        self.assertEqual('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', self.gpg.has_secret_key_with_uid('invalid_and_insecure@openpgpbot.eff.org'))
         self.assertFalse(self.gpg.has_secret_key_with_uid('fluff'))
 
     def test_has_public_key_with_uid(self):
