@@ -75,6 +75,10 @@ class GnuPG(object):
 
         return out
 
+    def sign(self, message):
+        """Signs message and returns ASCII armored sig"""
+        return False
+
     def has_secret_key_with_uid(self, uid):
         """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
         

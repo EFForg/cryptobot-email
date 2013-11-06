@@ -51,6 +51,10 @@ class GnuPGTest(unittest.TestCase):
         ciphertext = self.gpg.encrypt('test', '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387')
         self.assertFalse(ciphertext == False)
         self.assertTrue(bot.PGP_ARMOR_HEADER_MESSAGE in ciphertext)
+
+    def test_sign(self):
+        sig = self.gpg.sign('test')
+        self.assertTrue(bot.PGP_ARMOR_HEADER_SIGNATURE in sig)
     
     def test_has_secret_key_with_uid(self):
         self.assertEqual('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', self.gpg.has_secret_key_with_uid('OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'))
