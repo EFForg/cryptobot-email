@@ -246,6 +246,7 @@ class EmailSender(object):
 
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
 
+        # start the email
         msg = MIMEMultipart('mixed')
         msg['Subject'] = subject
         msg['From'] = from_email
@@ -276,6 +277,13 @@ class EmailSender(object):
             pubkey_part.set_payload(pubkey)
             pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
             msg.attach(pubkey_part)
+
+        # will this message be signed and encrypted, or just signed?
+        encrypted = not not self.message.pubkey_fingerprint
+        if encrypted:
+            wrapper = None
+        else:
+            wrapper = None
 
         self.send_email(msg, from_email, to_email)
 
