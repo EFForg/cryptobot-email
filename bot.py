@@ -18,6 +18,7 @@ import quopri
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
 PGP_ARMOR_HEADER_PUBKEY    = "-----BEGIN PGP PUBLIC KEY BLOCK-----"
+PGP_ARMOR_FOOTER_PUBKEY    = "-----END PGP PUBLIC KEY BLOCK-----"
 
 try:
     import config
@@ -370,12 +371,17 @@ class OpenPGPMessage(Message):
             for part in pubkey_parts:
                 pubkeys += self._find_pubkeys(part)
 
+            # does it look like there was an attempt at including a pubkey?
+            if len(pubkeys) == 0 and PGP_ARMOR_HEADER_PUBKEY in part:
+                self._pubkey_included_wrong = True
+
             # looks pubkey is included, try importing
             if len(pubkeys) > 0:
                 fingerprints = []
                 for pubkey in pubkeys:
                     fingerprint = self._gpg.import_keys(pubkey)
-                    fingerprints.append(fingerprint)
+                    if fingerprint:
+                        fingerprints.append(fingerprint)
                 fingerprints = list(set(fingerprints))
                 
                 if len(fingerprints) == 0:
@@ -404,11 +410,11 @@ class OpenPGPMessage(Message):
         pubkey = ""
         for line in s.split('\n'):
             line = line.rstrip()
-            if line == "-----BEGIN PGP PUBLIC KEY BLOCK-----":
+            if line == PGP_ARMOR_HEADER_PUBKEY:
                 in_block = True
             if in_block:
                 pubkey += line + "\n"
-            if line == "-----END PGP PUBLIC KEY BLOCK-----":
+            if line == PGP_ARMOR_FOOTER_PUBKEY:
                 in_block = False
                 pubkeys.append(pubkey)
                 pubkey = ""
