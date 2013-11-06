@@ -38,6 +38,8 @@ To run the tests:
 
     $ ./test.py
 
-1. [OpenPGP RFC 4880](http://tools.ietf.org/html/rfc4880)
-2. [MIME RFC 2045](http://tools.ietf.org/html/rfc2045)
-3. [Helpful tutorial for Python's imaplib](http://yuji.wordpress.com/2011/06/22/python-imaplib-imap-example-with-gmail/)
+Relevant specs:
+
+* [RFC 4880 - OpenPGP Message Format](http://tools.ietf.org/html/rfc4880)
+* [RFC 2045 - Multipurpose Internet Mail Extensions (MIME)](http://tools.ietf.org/html/rfc2045)
+* [RFC 3156 - MIME Security with OpenPGP](http://tools.ietf.org/html/rfc3156)
