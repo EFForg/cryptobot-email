@@ -283,30 +283,46 @@ class EmailSender(object):
             pubkey_part.set_payload(pubkey)
             msg.attach(pubkey_part)
 
-        # will this message be signed and encrypted, or just signed?
-        encrypted = not not self.message.pubkey_fingerprint
-        if encrypted:
-            wrapper = None
-        else:
-            # sign the message
-            msg_text = msg.as_string().replace('\n', '\r\n')
-            sig = self._gpg.sign(msg_text)
+        # sign the message
+        msg_text = msg.as_string().replace('\n', '\r\n')
+        sig = self._gpg.sign(msg_text)
 
-            # make a sig part
-            sig_part = MIMEBase('application', 'pgp-signature', name='signature.asc')
-            sig_part.add_header('Content-Description', 'OpenPGP digital signature')
-            sig_part.add_header('Content-Disposition', 'attachment; filename="signature.asc"')
-            sig_part.set_payload(sig)
+        # make a sig part
+        sig_part = MIMEBase('application', 'pgp-signature', name='signature.asc')
+        sig_part.add_header('Content-Description', 'OpenPGP digital signature')
+        sig_part.add_header('Content-Disposition', 'attachment; filename="signature.asc"')
+        sig_part.set_payload(sig)
 
-            # wrap it all up in multipart/signed
-            wrapper = MIMEMultipart(_subtype="signed", micalg="pgp-sha1", protocol="application/pgp-signature")
-            wrapper.attach(msg)
-            wrapper.attach(sig_part)
+        # wrap it all up in multipart/signed
+        signed = MIMEMultipart(_subtype="signed", micalg="pgp-sha1", protocol="application/pgp-signature")
+        signed.attach(msg)
+        signed.attach(sig_part)
         
+        # if we have a fingerprint to encrypt to, encrypt it
+        if self.message.pubkey_fingerprint:
+            # encrypt the message
+            signed_text = signed.as_string()
+            ciphertext = self._gpg.encrypt(signed_text, self.message.pubkey_fingerprint)
+
+            # make an application/pgp-encrypted part
+            encrypted = MIMEBase("application", "pgp-encrypted")
+            encrypted.set_payload("Version: 1\r\n")
+
+            # make application/octet-stream part
+            octet_stream = MIMEBase("application", "octet-stream")
+            octet_stream.set_payload(ciphertext)
+
+            # make the multipart/encrypted wrapper
+            wrapper = MIMEMultipart(_subtype="encrypted", protocol="application/pgp-encrypted")
+            wrapper.attach(encrypted)
+            wrapper.attach(octet_stream)
+
+        else:
+            wrapper = signed
+
         wrapper['Subject'] = subject
         wrapper['From'] = from_email
         wrapper['To'] = to_email
-
         self.send_email(wrapper, from_email, to_email)
 
     def send_email(self, msg, from_email, to_email):
