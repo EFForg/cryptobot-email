@@ -22,4 +22,18 @@ GOOD: Your email was signed. I can be pretty sure it really came from you and no
 WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.
 {% endif %}
 
-Your fingerprint: {{pubkey_fingerprint}}
+{% if pubkey_included %}
+GOOD: You included your public key. Thank you! Because you supplied your public key, I can encrypt this email using it. If you're reading this, you have successfully used your secret key to decrypt it.
+{% elif pubkey_included_wrong %}
+WARNING: Did you try to include your public key? It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send.
+{% else %}
+WARNING: You didn't include your public key. Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.
+{% endif %}
+
+SUMMARY:
+encrypted_right: {{encrypted_right}}
+encrypted_wrong: {{encrypted_wrong}}
+signed: {{signed}}
+pubkey_included: {{pubkey_included}}
+pubkey_included_wrong: {{pubkey_included_wrong}}
+pubkey_fingerprint: {{pubkey_fingerprint}}

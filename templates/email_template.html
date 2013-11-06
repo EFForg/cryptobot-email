@@ -26,7 +26,23 @@
       <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.</p>
       {% endif %}
 
-      <p>Your fingerprint: {{pubkey_fingerprint}}</p>
+      {% if pubkey_included %}
+      <p style="color:#009900;"><strong>You included your public key.</strong> Thank you! Because you supplied your public key, I can encrypt this email using it. If you're reading this, you have successfully used your secret key to decrypt it.</p>
+      {% elif pubkey_included_wrong %}
+      <p style="color:#990000;"><strong>Did you try to include your public key?</strong> It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send.</p>
+      {% else %}
+      <p style="color:#990000;"><strong>You didn't include your public key.</strong> Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.</p>
+      {% endif %}
+
+      <table style="background-color:#999999; padding:10px; margin:20px auto;">
+        <tr><td colspan="2" style="font-size:0.8em; font-weight:bold; text-align:center;">Summary</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">encrypted_right</td><td style="color:#000000; font-size:0.8em;">{{encrypted_right}}</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">encrypted_wrong</td><td style="color:#000000; font-size:0.8em;">{{encrypted_wrong}}</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">signed</td><td style="color:#000000; font-size:0.8em;">{{signed}}</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">pubkey_included</td><td style="color:#000000; font-size:0.8em;">{{pubkey_included}}</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">pubkey_included_wrong</td><td style="color:#000000; font-size:0.8em;">{{pubkey_included_wrong}}</td></tr>
+        <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">pubkey_fingerprint</td><td style="color:#000000; font-size:0.8em;">{{pubkey_fingerprint}}</td></tr>
+      </table>
     </div>
   </body>
 </html>
