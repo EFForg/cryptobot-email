@@ -226,9 +226,11 @@ class EmailSender(object):
         self.message = message
         self.env = env
         self.fp = fp
-        
+         
         self.html_template = self.env.get_template('email_template.html')
         self.txt_template = self.env.get_template('email_template.txt')
+        
+        self._gpg = GnuPG()
 
         self.construct_and_send_email()
 
@@ -256,13 +258,8 @@ class EmailSender(object):
 
         # start the email
         msg = MIMEMultipart('mixed')
-        msg['Subject'] = subject
-        msg['From'] = from_email
-        msg['To'] = to_email
-
         body = MIMEMultipart('alternative')
 
-        # make a response template based on information in OpenPGPMessage (#2)
         template_vars = {
             'encrypted_right': self.message.encrypted_right,
             'encrypted_wrong': self.message.encrypted_wrong,
@@ -271,19 +268,19 @@ class EmailSender(object):
             'pubkey_included_wrong': self.message.pubkey_included_wrong,
             'pubkey_fingerprint': self.message.pubkey_fingerprint
         }
+
         body.attach(MIMEText(self.txt_template.render(template_vars), 'plain'))
         body.attach(MIMEText(self.html_template.render(template_vars), 'html'))
         msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
         if not self.message.encrypted_right:
-            gpg = GnuPG()
-            pubkey = str(gpg.export_keys(self.fp))
+            pubkey = str(self._gpg.export_keys(self.fp))
             pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fp)[:-8])
 
             pubkey_part = MIMEBase('application', 'pgp-keys')
-            pubkey_part.set_payload(pubkey)
             pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
+            pubkey_part.set_payload(pubkey)
             msg.attach(pubkey_part)
 
         # will this message be signed and encrypted, or just signed?
@@ -291,9 +288,26 @@ class EmailSender(object):
         if encrypted:
             wrapper = None
         else:
-            wrapper = None
+            # sign the message
+            msg_text = msg.as_string().replace('\n', '\r\n')
+            sig = self._gpg.sign(msg_text)
 
-        self.send_email(msg, from_email, to_email)
+            # make a sig part
+            sig_part = MIMEBase('application', 'pgp-signature', name='signature.asc')
+            sig_part.add_header('Content-Description', 'OpenPGP digital signature')
+            sig_part.add_header('Content-Disposition', 'attachment; filename="signature.asc"')
+            sig_part.set_payload(sig)
+
+            # wrap it all up in multipart/signed
+            wrapper = MIMEMultipart(_subtype="signed", micalg="pgp-sha1", protocol="application/pgp-signature")
+            wrapper.attach(msg)
+            wrapper.attach(sig_part)
+        
+        wrapper['Subject'] = subject
+        wrapper['From'] = from_email
+        wrapper['To'] = to_email
+
+        self.send_email(wrapper, from_email, to_email)
 
     def send_email(self, msg, from_email, to_email):
         if config.SMTP_SERVER == 'localhost':
