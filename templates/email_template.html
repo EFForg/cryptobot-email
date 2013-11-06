@@ -1,23 +1,32 @@
 <html>
   <body>
-    <p><img src="https://raw.github.com/EFForg/cryptobot-email/master/doc/images/cryptobot-small.png" /></p>
+    <div style="max-width:600px; margin:0 auto;">
+<pre style="background-color:#333333; color:#ffffff; padding:15px; font-weight:bold; text-align:center;">
+   ______                 __        ____        __ 
+  / ____/______  ______  / /_____  / __ )____  / /_
+ / /   / ___/ / / / __ \/ __/ __ \/ __  / __ \/ __/
+/ /___/ /  / /_/ / /_/ / /_/ /_/ / /_/ / /_/ / /_  
+\____/_/   \__, / .___/\__/\____/_____/\____/\__/  
+          /____/_/                                 
+</pre>
 
-    <p><strong>Greetings, human. You are interacting with the CryptoBot human-computer email encryption interface.</strong></p>
-  
-    {% if encrypted_right %}
-    <p style="color:#009900;"><strong>Your email was encrypted.</strong> It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)</p>
-    {% elif encrypted_wrong %}
-    <p style="color:#990000;"><strong>Your email was encrypted, but I couldn't decrypt it.</strong> It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.</p>
-    {% else %}
-    <p style="color:#990000;"><strong>Your email was not encrypted.</strong> In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.</p>
-    {% endif %}
+      <p><strong>Greetings, human. You are interacting with the CryptoBot human-computer email encryption interface.</strong></p>
+    
+      {% if encrypted_right %}
+      <p style="color:#009900;"><strong>Your email was encrypted.</strong> It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)</p>
+      {% elif encrypted_wrong %}
+      <p style="color:#990000;"><strong>Your email was encrypted, but I couldn't decrypt it.</strong> It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.</p>
+      {% else %}
+      <p style="color:#990000;"><strong>Your email was not encrypted.</strong> In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.</p>
+      {% endif %}
 
-    {% if signed %}
-    <p style="color:#009900;"><strong>Your email was signed.</strong> I can be pretty sure it really came from you and nobody changed the text of what you wrote.</p>
-    {% else %}
-    <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.</p>
-    {% endif %}
+      {% if signed %}
+      <p style="color:#009900;"><strong>Your email was signed.</strong> I can be pretty sure it really came from you and nobody changed the text of what you wrote.</p>
+      {% else %}
+      <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.</p>
+      {% endif %}
 
-    <p>Your fingerprint: {{pubkey_fingerprint}}</p>
+      <p>Your fingerprint: {{pubkey_fingerprint}}</p>
+    </div>
   </body>
 </html>
