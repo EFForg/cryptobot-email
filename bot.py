@@ -77,7 +77,11 @@ class GnuPG(object):
 
     def sign(self, message):
         """Signs message and returns ASCII armored sig"""
-        return False
+
+        # note, this assumes you only have 1 secret key in your keyring.
+        # it might make sense to add --default-key FINGERPRINT later.
+        out, err = self._gpg(['--armor', '--detach-sign'], message)
+        return out
 
     def has_secret_key_with_uid(self, uid):
         """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
