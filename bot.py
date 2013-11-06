@@ -76,11 +76,46 @@ class GnuPG(object):
 
     def has_secret_key_with_uid(self, uid):
         """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
-        out, err = self._gpg(['--list-secret-keys', '--with-colons'])
+        
+        """
+        When running gpg --list-secret-keys --with-colons --fingerprint, here is some sample output.
+
+        sec::4096:1:061BDEF98CCDA4FA:2013-11-05::::CryptoBot Email <wsmfzz62@gmail.com>:::
+        fpr:::::::::78C9B0F7289B460C823A2102061BDEF98CCDA4FA:
+
+        Or, for more complicated output:
+
+        sec::4096:1:B4D25A1E99999697:2011-06-24:2014-09-18:::Micah Lee <micah@eff.org>:::
+        fpr:::::::::5C17616361BD9F92422AC08BB4D25A1E99999697:
+        uid:::::::21C57F8639CA1D1D9A9F3BE78129ED0043C11693::Micah Lee <micahflee@gmail.com>:
+        uid:::::::BEE1517245C07B111BEFC41EEB1CDEE5DF0847E0::Micah Lee <micahflee@riseup.net>:
+        uid:::::::7573A1517811E970A01B05BCE2E48DD8FEFE647E::Micah Lee <micah@pressfreedomfoundation.org>:
+        uid:::::::763D70011F3C02DD325865D92960346A49D07F4C::Micah Lee <micah@micahflee.com>:
+        ssb::4096:1:CE8CDD55E8839F99:2011-06-24:::::::
+        sec::2048:1:AF878F07E341E711:2012-02-24::::EFF Webmaster <webmaster@eff.org>:::
+        fpr:::::::::1729DC3DB3F635D25B316984AF878F07E341E711:
+        ssb::2048:1:80939142EB82ABA7:2012-02-24:::::::
+
+        This loops through the output looking for a valid uid. If it finds one, it returns the fingerprint
+        from the fpr line associated with that keypair. If the valid uid is the primary id, it's listed
+        in the sec line (before fpr), but if it's a different uid it's listed in a uid line (after fpr).
+        So it's confusing, but this seems to work.
+        """
+        
+        out, err = self._gpg(['--list-secret-keys', '--with-colons', '--fingerprint'])
+        
+        return_fp = False
+        cur_fp = ''
         for line in out.split('\n'):
+            if line[0:3] == 'fpr':
+                cur_fp = line.lstrip('fpr:::::::::').rstrip(':')
+                if return_fp:
+                    return cur_fp
             if line[0:3] == 'sec' or line[0:3] == 'uid':
                 if uid in line:
-                    return True
+                    if cur_fp != '':
+                        return cur_fp
+                    return_fp = True
         return False
 
     def has_public_key_with_uid(self, fingerprint, uid):
