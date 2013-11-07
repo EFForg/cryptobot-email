@@ -284,8 +284,8 @@ class EmailSender(object):
             msg.attach(pubkey_part)
 
         # sign the message
-        msg_text = msg.as_string().replace('\n', '\r\n')
-        sig = self._gpg.sign(msg_text)
+        msg_string = msg.as_string().replace('\n', '\r\n')
+        sig = self._gpg.sign(msg_string)
 
         # make a sig part
         sig_part = MIMEBase('application', 'pgp-signature', name='signature.asc')
@@ -298,11 +298,22 @@ class EmailSender(object):
         signed.attach(msg)
         signed.attach(sig_part)
         
+        # if we're just signing and not encrypting this message, add the headers directly to the signed part
+        if not self.message.pubkey_fingerprint:
+            signed['Subject'] = subject
+            signed['From'] = from_email
+            signed['To'] = to_email
+        
+        # need to add a '\r\n' right before the sig part (#19)
+        # because of this bug http://bugs.python.org/issue14983
+        signed_string = signed.as_string()
+        i = signed_string.rfind('--', 0, signed_string.find('Content-Type: application/pgp-signature; name="signature.asc"'))
+        signed_string = signed_string[0:i]+'\r\n'+signed_string[i:]
+
         # if we have a fingerprint to encrypt to, encrypt it
         if self.message.pubkey_fingerprint:
             # encrypt the message
-            signed_text = signed.as_string()
-            ciphertext = self._gpg.encrypt(signed_text, self.message.pubkey_fingerprint)
+            ciphertext = self._gpg.encrypt(signed_string, self.message.pubkey_fingerprint)
 
             # make an application/pgp-encrypted part
             encrypted = MIMEBase("application", "pgp-encrypted")
@@ -317,21 +328,26 @@ class EmailSender(object):
             wrapper.attach(encrypted)
             wrapper.attach(octet_stream)
 
+            # add headers to the encryption wrapper
+            wrapper['Subject'] = subject
+            wrapper['From'] = from_email
+            wrapper['To'] = to_email
+
+            final_message = wrapper.as_string()
+
         else:
-            wrapper = signed
+            final_message = signed_string
 
-        wrapper['Subject'] = subject
-        wrapper['From'] = from_email
-        wrapper['To'] = to_email
-        self.send_email(wrapper, from_email, to_email)
+        self.send_email(final_message, from_email, to_email)
 
-    def send_email(self, msg, from_email, to_email):
+    def send_email(self, msg_string, from_email, to_email):
         if config.SMTP_SERVER == 'localhost':
             s = smtplib.SMTP(config.SMTP_SERVER)
         else:
             s = smtplib.SMTP_SSL(config.SMTP_SERVER)
             s.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
-        s.sendmail(from_email, [to_email], msg.as_string())
+
+        s.sendmail(from_email, [to_email], msg_string)
         s.quit()
         print 'Responded to {0}'.format(self.message['From'])
 
