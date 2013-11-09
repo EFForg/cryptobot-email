@@ -8,6 +8,9 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from cStringIO import StringIO
+from email.generator import Generator
+
 import sys, os, subprocess
 import imaplib, smtplib
 import email
@@ -234,6 +237,15 @@ class EmailSender(object):
 
         self.construct_and_send_email()
 
+    def as_string(self, msg):
+        # using this instead of msg.as_string(), because the header wrapping was causing sig verification problems
+        # http://docs.python.org/2/library/email.message.html#email.message.Message.as_string
+        fp = StringIO()
+        g = Generator(fp, mangle_from_=False, maxheaderlen=0)
+        g.flatten(msg)
+        text = fp.getvalue()
+        return text
+
     def construct_and_send_email(self):
         # who to respond to?
         to_email = None
@@ -269,8 +281,10 @@ class EmailSender(object):
             'pubkey_fingerprint': self.message.pubkey_fingerprint
         }
 
-        body.attach(MIMEText(self.txt_template.render(template_vars), 'plain'))
-        body.attach(MIMEText(self.html_template.render(template_vars), 'html'))
+        body_txt = self.txt_template.render(template_vars)
+        body_html = self.html_template.render(template_vars)
+        body.attach(MIMEText(body_txt, 'plain'))
+        body.attach(MIMEText(body_html, 'html'))
         msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
@@ -284,7 +298,7 @@ class EmailSender(object):
             msg.attach(pubkey_part)
 
         # sign the message
-        msg_string = msg.as_string().replace('\n', '\r\n')
+        msg_string = (self.as_string(msg)+'\n').replace('\n', '\r\n')
         sig = self._gpg.sign(msg_string)
 
         # make a sig part
@@ -306,7 +320,7 @@ class EmailSender(object):
         
         # need to add a '\r\n' right before the sig part (#19)
         # because of this bug http://bugs.python.org/issue14983
-        signed_string = signed.as_string()
+        signed_string = self.as_string(signed)
         i = signed_string.rfind('--', 0, signed_string.find('Content-Type: application/pgp-signature; name="signature.asc"'))
         signed_string = signed_string[0:i]+'\r\n'+signed_string[i:]
 
@@ -333,7 +347,7 @@ class EmailSender(object):
             wrapper['From'] = from_email
             wrapper['To'] = to_email
 
-            final_message = wrapper.as_string()
+            final_message = self.as_string(wrapper)
 
         else:
             final_message = signed_string
