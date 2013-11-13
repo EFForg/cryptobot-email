@@ -24,7 +24,7 @@ Using `PGP` for email encryption can be very inconvenient. For example, if you s
 
 The first step is installing the appropriate software. You need to download and install `GPG` on your computer, generate a `PGP keypair`, and install and configure an email client that supports `OpenPGP` integration. You can use `OpenPGP` with your Gmail or other webmail account, but you won't be able to use webmail for encrypting, decrypting, and verifying emails.
 
-If you'd like to use `OpenPGP` with Gmail, [click here to configure your account first](/doc/gmail.md).
+If you'd like to use `OpenPGP` with Gmail, [click here to configure your account first](gmail.md).
 
 What operating system do you use?
 

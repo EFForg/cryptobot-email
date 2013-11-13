@@ -1,3 +1,3 @@
 # CryptoBot Email Documentation
 
-* [Getting Started](/doc/getting_started/index.md)
+* [Getting Started](getting_started/index.md)
