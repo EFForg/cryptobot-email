@@ -1,6 +1,8 @@
 # Getting Started With OpenPGP
 
-Greetings, human. I'm glad you're interested in using `OpenPGP`! It's a difficult technology to master, so don't feel bad if it takes some time to learn.  Before we jump in, I'm going to start with a little bit of the history, termonology, and concepts behind `OpenPGP`. If you want, you can slip down to the Installing Software section to get started immediately.
+Greetings, human. I'm glad you're interested in using `OpenPGP`! It's a difficult technology to master, so don't feel bad if it takes some time to learn.  Before we jump in, I'm going to start with a little bit of the history, termonology, and concepts behind `OpenPGP`. If you want, you can the Introduction section to get started immediately.
+
+## Introduction
 
 In 1991, Phil Zimmermann developed email encryption software called [Pretty Good Privacy](https://en.wikipedia.org/wiki/Pretty_Good_Privacy), or `PGP`, which he intended peace activists to use while organizing in the anti-nuclear movement. Today, PGP is a company that sells a proprietary encryption program by the same name. `OpenPGP` is the open protocol that defines how `PGP` encryption works, and `GnuPG` (`GPG` for short) is free software, and is 100% compatible with the proprietary version. `GPG` is much more popular than `PGP` today because it's free and open source. The terms `PGP`, `OpenPGP`, and `GPG` are often used interchangably.
 
@@ -18,8 +20,15 @@ Since you need other people's `public keys` in order to encrypt messages to them
 
 Using `PGP` for email encryption can be very inconvenient. For example, if you set up `PGP` on your computer but have received an encrypted email on your phone, you won't be able to decrypt it to read the email until you get to your computer. However, if you use it correctly and keep your `secret key` from getting compromised, it works to keep the contents of your email private from everyone else, including the people who run your email server.
 
-## Installing Software
+## Seting Up Your Computer for OpenPGP
 
 The first step is installing the appropriate software. You need to download and install `GPG` on your computer, generate a `PGP keypair`, and install and configure an email client that supports `OpenPGP` integration. You can use `OpenPGP` with your Gmail or other webmail account, but you won't be able to use webmail for encrypting, decrypting, and verifying emails.
 
-If you'd like to use `OpenPGP` with Gmail, [click here to configure your account first](/doc/gmail.md).
+If you'd like to use `OpenPGP` with Gmail, [click here to configure your account first](/gmail.md).
+
+What operating system do you use?
+
+* [Windows](/windows.md)
+* [Mac OS X](/osx.md)
+* [Linux](/linux.md) (Ubuntu, Debian, Fedora, etc.)
+* [Tails](/tails.md)
