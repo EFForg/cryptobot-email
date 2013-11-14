@@ -363,6 +363,7 @@ class EmailSender(object):
             final_message = signed_string
 
         self.send_email(final_message, from_email, to_email)
+        print 'Responded to {0} {1}'.format(self.message['From'], str(template_vars))
 
     def send_email(self, msg_string, from_email, to_email):
         if config.SMTP_SERVER == 'localhost':
@@ -373,7 +374,6 @@ class EmailSender(object):
 
         s.sendmail(from_email, [to_email], msg_string)
         s.quit()
-        print 'Responded to {0}'.format(self.message['From'])
 
     def sign_body(self):
         # need to implement PGP/MIME to sign the body here
@@ -544,13 +544,6 @@ def main(fp):
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
     for message in messages:
-        if message.encrypted_right:
-            print '"%s" from %s is encrypted' % (message['Subject'], message['From'])
-        if message.encrypted_wrong:
-            print '"%s" from %s is encrypted to the wrong key' % (message['Subject'], message['From'])
-        if message.signed:
-            print '"%s" from %s is signed' % (message['Subject'], message['From'])
-
         # respond to the email
         EmailSender(message, template_env, fp)
 
