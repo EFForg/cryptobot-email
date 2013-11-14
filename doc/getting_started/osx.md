@@ -119,10 +119,16 @@ Try sending me an encrypted and signed email next!
 
 When you first open Apple Mail, you'll see a first run wizard that helps you set up your email address. Fill out your name, email address, and your email password and click Create.
 
-[image apple mail wizard]
+![Mail account setup wizard](../images/osx/applemail1.png)
 
 If you use popular free email services like Gmail, Mail should be able to automatically detect your email settings when you click Continue. If it doesn't, you may need to manually configure your IMAP and SMTP settings. In this case, Mail auto-detected my email settings. You can optionally set up Calendar and Chat in this step as well.
 
-[image apple mail wizard, autodetected]
+![Mail account setup auto-detect](../images/osx/applemail2.png)
 
-(note, the Apple Mail tutorial is still a work in progress)
+When you're composing a new message, there are two icons just beneath the Subject field. There's a padlock (encrypt email) and a star (digitally sign email). If the padlock is closed it means this email will be encrypted, and if the star has a check in it it means this email will be digitally signed.
+
+![Email to Bruno](../images/osx/applemail3.png)
+
+You can always sign your email. Because digitally signing emails requires your secret key, Mail will pop up a window asking for your passphrase when you first sign an email. You can only encrypt emails if you have the public key of the person you're emailing. If the encryption padlock icon is unlocked and greyed out so you can't click on it, this means you first need to import the recipient's public key. To manage your keys while using Mail, use the GPG Keychain Access app.
+
+Try sending me an encrypted and signed email next!
