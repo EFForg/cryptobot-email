@@ -28,7 +28,7 @@ If you'd like to use `OpenPGP` with Gmail, [click here to configure your account
 
 What operating system do you use?
 
-* [Windows](/windows.md)
-* [Mac OS X](/osx.md)
-* [Linux](/linux.md) (Ubuntu, Debian, Fedora, etc.)
-* [Tails](/tails.md)
+* [Windows](windows.md)
+* [Mac OS X](osx.md)
+* [Linux](linux.md) (Ubuntu, Debian, Fedora, etc.)
+* [Tails](tails.md)
