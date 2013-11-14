@@ -31,11 +31,11 @@ PGP keys contain a name and an email address and some other settings. You're wel
 
 Before generating the key, expand "Advanced options". You can leave the comment blank, and leave the key type "RSA and RSA (default)". But make sure to change the Length field to `4096`. You can also choose an expiration date. When your key expires, you can always extend it's expiration date.
 
-When you're ready, click the "Generate key" button. Before it generates it will prompt you for a passphrase. Type your passphrase and click OK, and re-type it and click OK again to begin generating the key.
+When you're ready, click the "Generate key" button. Before it generates it will prompt you for a passphrase. Type your passphrase and click OK, and re-type it and click OK again.
 
 ![GPG Keychain Access, typing passphrase](../images/osx/gpgtools4.png)
 
-Then it will start generating your key. Generating crypto keys requires coming up with some truly random numbers. It shouldn't take any more than a couple of minutes to finish generating your key.
+Then it will start generating your key. It shouldn't take any more than a couple of minutes to finish generating your key.
 
 ![GPG Keychain Access, collecting entropy](../images/osx/gpgtools5.png)
 
@@ -77,7 +77,7 @@ It asks if you'd like to sign all of your email. Choose Yes and click continue.
 
 ![Enigmail wizard, sign emails by default](../images/osx/enigmail2.png)
 
-It asks if your outgoing mail should be encrypted by default. This would be ideal, but remember that you can only send encrypted email to other people who use PGP too. Since this probably isn't most people you no, it's best to choose No here and click Continue. (You can manually choose to encrypt emails to people who you know use PGP.)
+It asks if your outgoing mail should be encrypted by default. This would be ideal, but remember that you can only send encrypted email to other people who use PGP, and you need to have their public keys in your keychain as well. Since this probably isn't most people you send emails to, it's best to choose No here and click Continue. (You can manually choose to encrypt emails to people who you know use PGP.)
 
 ![Enigmail wizard, encrypt emails by default](../images/osx/enigmail3.png)
 
@@ -107,7 +107,7 @@ Then click OK to save all of the settings. Congratulations, you now have Thunder
 
 You can click the menu button, hover over OpenPGP, and open Key Management to see the PGP key manager that's build-in to Enigmail. It's very similar to GPG Keychain Access, and it's your choice which you use.
 
-When you're composing a new message, there are two icons in the bottom right corner of the window: a pen (digitally sign email) and a key (encrypt email).
+When you're composing a new message, there are two icons in the bottom right corner of the window: a pen (digitally sign email) and a key (encrypt email). If the icons are gold it means they are selected, and if they're silver it means they're not selected. Click on them to toggle signing and encrypting the email you're writing.
 
 ![Email to Bruno](../images/osx/thunderbird9.png)
 
