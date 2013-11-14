@@ -7,6 +7,7 @@ from mailbox import Message, Maildir
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.encoders import encode_quopri
 
 from cStringIO import StringIO
 from email.generator import Generator
@@ -282,9 +283,17 @@ class EmailSender(object):
         }
 
         body_txt = self.txt_template.render(template_vars)
+        txt_part = MIMEBase('text', 'plain')
+        txt_part.set_payload(body_txt)
+        encode_quopri(txt_part)
+        body.attach(txt_part)
+
         body_html = self.html_template.render(template_vars)
-        body.attach(MIMEText(body_txt, 'plain'))
-        body.attach(MIMEText(body_html, 'html'))
+        html_part = MIMEBase('text', 'html')
+        html_part.set_payload(body_html)
+        encode_quopri(html_part)
+        
+        body.attach(html_part)
         msg.attach(body)
 
         # if the message is not encrypted, attach public key (#16)
@@ -295,6 +304,7 @@ class EmailSender(object):
             pubkey_part = MIMEBase('application', 'pgp-keys')
             pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
             pubkey_part.set_payload(pubkey)
+            encode_quopri(pubkey_part)
             msg.attach(pubkey_part)
 
         # sign the message
