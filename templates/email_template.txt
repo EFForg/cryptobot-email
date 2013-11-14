@@ -8,6 +8,13 @@
 Greetings, human. You are interacting with the CryptoBot human-computer
 email encryption interface.
 
+{% if not encrypted_right and not signed and not pubkey_included %}
+You're not using PGP at all yet. Check out this guide to get get you started, and then try sending me another email:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/getting_started/index.md
+{% elif encrypted_right and signed and pubkey_included %}
+Congradulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.
+{% endif %}
+
 {% if encrypted_right %}
 GOOD: Your email was encrypted. It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)
 {% elif encrypted_wrong %}
@@ -30,6 +37,7 @@ WARNING: Did you try to include your public key? It looks like you tried to incl
 WARNING: You didn't include your public key. Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.
 {% endif %}
 
+{#
 SUMMARY:
 encrypted_right: {{encrypted_right}}
 encrypted_wrong: {{encrypted_wrong}}
@@ -37,3 +45,4 @@ signed: {{signed}}
 pubkey_included: {{pubkey_included}}
 pubkey_included_wrong: {{pubkey_included_wrong}}
 pubkey_fingerprint: {{pubkey_fingerprint}}
+#}

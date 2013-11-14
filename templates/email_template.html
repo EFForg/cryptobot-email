@@ -11,6 +11,12 @@
 </pre>
 
       <p><strong>Greetings, human. You are interacting with the CryptoBot human-computer email encryption interface.</strong></p>
+
+      {% if not encrypted_right and not signed and not pubkey_included %}
+      <p>You're not using PGP at all yet. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/getting_started/index.md">Check out this guide</a> to get get you started, and then try sending me another email.</p>
+      {% elif encrypted_right and signed and pubkey_included %}
+      <p>Congradulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.</p>
+      {% endif %}
     
       {% if encrypted_right %}
       <p style="color:#009900;"><strong>Your email was encrypted.</strong> It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)</p>
@@ -34,6 +40,7 @@
       <p style="color:#990000;"><strong>You didn't include your public key.</strong> Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.</p>
       {% endif %}
 
+      {#
       <table style="background-color:#999999; padding:10px; margin:20px auto;">
         <tr><td colspan="2" style="font-size:0.8em; font-weight:bold; text-align:center;">Summary</td></tr>
         <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">encrypted_right</td><td style="color:#000000; font-size:0.8em;">{{encrypted_right}}</td></tr>
@@ -43,6 +50,7 @@
         <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">pubkey_included_wrong</td><td style="color:#000000; font-size:0.8em;">{{pubkey_included_wrong}}</td></tr>
         <tr><td style="color:#000000; font-size:0.8em; padding-right:10px;">pubkey_fingerprint</td><td style="color:#000000; font-size:0.8em;">{{pubkey_fingerprint}}</td></tr>
       </table>
+      #}
     </div>
   </body>
 </html>
