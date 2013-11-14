@@ -117,4 +117,12 @@ Try sending me an encrypted and signed email next!
 
 ## Configuring Apple Mail
 
-Apple Mail coming soon...
+When you first open Apple Mail, you'll see a first run wizard that helps you set up your email address. Fill out your name, email address, and your email password and click Create.
+
+[image apple mail wizard]
+
+If you use popular free email services like Gmail, Mail should be able to automatically detect your email settings when you click Continue. If it doesn't, you may need to manually configure your IMAP and SMTP settings. In this case, Mail auto-detected my email settings. You can optionally set up Calendar and Chat in this step as well.
+
+[image apple mail wizard, autodetected]
+
+(note, the Apple Mail tutorial is still a work in progress)
