@@ -35,7 +35,7 @@ When you're ready, click the "Generate key" button. Before it generates it will 
 
 ![GPG Keychain Access, typing passphrase](../images/osx/gpgtools4.png)
 
-Then it will start generating your key. It shouldn't take any more than a couple of minutes to finish generating your key.
+Then it will start generating your key. It shouldn't take any more than a couple of minutes to finish.
 
 ![GPG Keychain Access, collecting entropy](../images/osx/gpgtools5.png)
 
