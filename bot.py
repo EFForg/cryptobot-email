@@ -265,7 +265,7 @@ class EmailSender(object):
             else:
                 subject = self.message['Subject']
         else:
-            subject = 'OpenPGPBot response'
+            subject = 'CryptoBot response'
 
         from_email = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
 
