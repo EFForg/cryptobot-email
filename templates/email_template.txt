@@ -15,18 +15,18 @@ https://github.com/EFForg/cryptobot-email/blob/master/doc/getting_started/README
 Congradulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.
 {% endif %}
 
+{% if signed %}
+GOOD: Your email was signed. I can be pretty sure it really came from you and nobody changed the text of what you wrote.
+{% else %}
+WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.
+{% endif %}
+
 {% if encrypted_right %}
 GOOD: Your email was encrypted. It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)
 {% elif encrypted_wrong %}
 WARNING: Your email was encrypted, but I couldn't decrypt it. It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.
 {% else %}
 WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.
-{% endif %}
-
-{% if signed %}
-GOOD: Your email was signed. I can be pretty sure it really came from you and nobody changed the text of what you wrote.
-{% else %}
-WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.
 {% endif %}
 
 {% if pubkey_included %}
