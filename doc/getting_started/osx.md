@@ -69,39 +69,21 @@ Search for "enigmail" in the search box in the top right.
 
 Click the Install button next to the Enigmail extension to download and install Enigmail. When it's done, click Restart Now to restart Thunderbird.
 
-The first time you run Thunderbird with Enigmail enabled it opens the OpenPGP Setup Wizard. It asks if you'd like to use the wizard. Choose Yes, and click Continue.
+The first time you run Thunderbird with Enigmail enabled it opens the OpenPGP Setup Wizard. Click Cancel. We will manually configure Enigmail instead.
 
 ![Enigmail wizard](../images/osx/enigmail1.png)
 
-It asks if you'd like to sign all of your email. Choose Yes and click continue.
-
-![Enigmail wizard, sign emails by default](../images/osx/enigmail2.png)
-
-It asks if your outgoing mail should be encrypted by default. This would be ideal, but remember that you can only send encrypted email to other people who use PGP, and you need to have their public keys in your keychain as well. Since this probably isn't most people you send emails to, it's best to choose No here and click Continue. (You can manually choose to encrypt emails to people who you know use PGP.)
-
-![Enigmail wizard, encrypt emails by default](../images/osx/enigmail3.png)
-
-It asks if you'd like it to change some default settings for you to make OpenPGP work better. Choose Yes and click Continue.
-
-![Enigmail wizard, preferences](../images/osx/enigmail4.png)
-
-Then it asks you to select a key that you want to use for signing and encrypting. Choose the key that you just created in the last step and click Continue.
-
-![Enigmail wizard, default PGP key](../images/osx/enigmail5.png)
-
-Then it shows a summary of what you just did. Click Continue to close it, and click Done on the next step.
-
-There are still a couple of settings that you should change before everything is set up perfectly. Click the menu button, hover over Preferences, and choose Account Settings.
+Click the menu button, hover over Preferences, and choose Account Settings.
 
 ![Open Account Settings](../images/osx/thunderbird6.png)
 
-Go to the Composition & Addressing tab. From here, you can optionally check "Compose messages in HTML format". It's up to you if you use HTML or not. HTML email lets you use formatting (like bold and italic), but some people find it annoying as well.
+Go to the OpenPGP Security tab. Make sure "Enable OpenPGP support (Enigmail) for this identity" is checked. "Use specific OpenPGP key ID" should be selected, and if your key isn't already selected you can click Select Key to select it.
 
-![Account Settings, Composition and Addressing](../images/osx/thunderbird7.png)
+You should also check "Sign non-encrypted message by default", "Sign encrypted messages by default", and "Use PGP/MIME by default", but not "Encrypt messages by default".
 
-Then choose the OpenPGP Security tab. "Sign non-encrypted message by default" and "Sign encrypted messages by default" should already be checked. Make sure you also check "Use PGP/MIME by default".
+It would be ideal to encrypt all the emails you send, but remember that you can only send encrypted email to other people who use PGP, and you need to have their public keys in your keychain as well. Unless everyone you intend to email already uses PGP, it doesn't make sense to always encrypt by default. (You can manually choose to encrypt emails to people who you know use PGP.)
 
-![Account Settings, OpenPGP Security](../images/osx/thunderbird8.png)
+![Account Settings, OpenPGP Security](../images/osx/thunderbird7.png)
 
 Then click OK to save all of the settings. Congratulations, you now have Thunderbird and Enigmail set up! Here are a couple of quick pointers.
 
@@ -109,7 +91,7 @@ You can click the menu button, hover over OpenPGP, and open Key Management to se
 
 When you're composing a new message, there are two icons in the bottom right corner of the window: a pen (digitally sign email) and a key (encrypt email). If the icons are gold it means they are selected, and if they're silver it means they're not selected. Click on them to toggle signing and encrypting the email you're writing.
 
-![Email to Bruno](../images/osx/thunderbird9.png)
+![Email to Bruno](../images/osx/thunderbird8.png)
 
 You can always sign your emails. Because digitally signing emails requires your secret key, Enigmail will pop up a window asking for your passphrase when you first sign an email. You can only encrypt emails if you have the public key of the person you're emailing. You can try searching for people's public keys from GPG Keychain Access or from Enigmail's Key Management, and you can import keys that people email you as well.
 
