@@ -18,23 +18,28 @@ Congradulations, you're using PGP correctly! Now you might want to learn about w
 {% if signed %}
 GOOD: Your email was signed. I can be pretty sure it really came from you and nobody changed the text of what you wrote.
 {% else %}
-WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.
+WARNING: Your email was not signed. It's possible for an attacker to spoof the "From" header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote. Learn how to sign your emails here:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/signing_email/README.md
 {% endif %}
 
 {% if encrypted_right %}
 GOOD: Your email was encrypted. It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)
 {% elif encrypted_wrong %}
-WARNING: Your email was encrypted, but I couldn't decrypt it. It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.
+WARNING: Your email was encrypted, but I couldn't decrypt it. It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key. Learn how to encrypt your emails here:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/encrypting_email/README.md
 {% else %}
-WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.
+WARNING: Your email was not encrypted. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key. Learn how to encrypt your emails here:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/encrypting_email/README.md
 {% endif %}
 
 {% if pubkey_included %}
 GOOD: You included your public key. Thank you! Because you supplied your public key, I can encrypt this email using it. If you're reading this, you have successfully used your secret key to decrypt it.
 {% elif pubkey_included_wrong %}
-WARNING: Did you try to include your public key? It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send.
+WARNING: Did you try to include your public key? It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send. Learn how to send me your public key here:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/including_pubkey/README.md
 {% else %}
-WARNING: You didn't include your public key. Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.
+WARNING: You didn't include your public key. Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email. Learn how to send me your public key here:
+https://github.com/EFForg/cryptobot-email/blob/master/doc/including_pubkey/README.md
 {% endif %}
 
 {#

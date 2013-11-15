@@ -21,23 +21,23 @@
       {% if signed %}
       <p style="color:#009900;"><strong>Your email was signed.</strong> I can be pretty sure it really came from you and nobody changed the text of what you wrote.</p>
       {% else %}
-      <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote.</p>
+      <p style="color:#990000;"><strong>Your email was not signed.</strong> It's possible for an attacker to spoof the &quot;From&quot; header in an email to make it look like it's coming from you. If you PGP-sign your emails, I can be pretty sure that it really came from you, and nobody changed the text of what you wrote. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/signing_email/README.md">Learn how to sign your emails.</a></p>
       {% endif %}
     
       {% if encrypted_right %}
       <p style="color:#009900;"><strong>Your email was encrypted.</strong> It would be hard for anyone else to read the content of what you wrote to me. (However, the metadata, including your email address, my email address, the subject, and the date you sent this email, cannot be protected by PGP.)</p>
       {% elif encrypted_wrong %}
-      <p style="color:#990000;"><strong>Your email was encrypted, but I couldn't decrypt it.</strong> It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key.</p>
+      <p style="color:#990000;"><strong>Your email was encrypted, but I couldn't decrypt it.</strong> It looks like you encrypted it to the wrong PGP public key. In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my correct public key. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/encrypting_email/README.md">Learn how to encrypt your emails.</a></p>
       {% else %}
-      <p style="color:#990000;"><strong>Your email was not encrypted.</strong> In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key.</p>
+      <p style="color:#990000;"><strong>Your email was not encrypted.</strong> In case you don't have it, I've attached a copy of my public key. Try emailing me again, but this time encrypting your message to my public key. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/encrypting_email/README.md">Learn how to encrypt your emails.</a></p>
       {% endif %}
 
       {% if pubkey_included %}
       <p style="color:#009900;"><strong>You included your public key.</strong> Thank you! Because you supplied your public key, I can encrypt this email using it. If you're reading this, you have successfully used your secret key to decrypt it.</p>
       {% elif pubkey_included_wrong %}
-      <p style="color:#990000;"><strong>Did you try to include your public key?</strong> It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send.</p>
+      <p style="color:#990000;"><strong>Did you try to include your public key?</strong> It looks like you tried to include your public key, but I wasn't able to import it. Can you make sure your public key is included correctly? Either send it to me as an attachment or paste it in the body of the email you send. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/including_pubkey/README.md">Learn how to send me your public key.</a></p>
       {% else %}
-      <p style="color:#990000;"><strong>You didn't include your public key.</strong> Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email.</p>
+      <p style="color:#990000;"><strong>You didn't include your public key.</strong> Can you send me another email, this time including your public key? You can either send your public key as an attachment or copy and paste it into the body the email. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/including_pubkey/README.md">Learn how to send me your public key.</a></p>
       {% endif %}
 
       {#
