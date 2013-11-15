@@ -1,5 +1,7 @@
 # How to Encrypt an Email
 
+If you haven't read the [Getting Started](../getting_started/README.md) guide, go read it now first.
+
 In order to send and receive PGP-encrypted emails, both parties must have PGP keys. 
 
 (and more coming soon)
