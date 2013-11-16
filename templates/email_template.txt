@@ -12,7 +12,7 @@ email encryption interface.
 You're not using PGP at all yet. Check out this guide to get get you started, and then try sending me another email:
 https://github.com/EFForg/cryptobot-email/blob/master/doc/getting_started/README.md
 {% elif encrypted_right and signed and pubkey_included %}
-Congradulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.
+Congratulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.
 {% endif %}
 
 {% if signed %}

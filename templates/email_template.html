@@ -15,7 +15,7 @@
       {% if not encrypted_right and not signed and not pubkey_included %}
       <p>You're not using PGP at all yet. <a href="https://github.com/EFForg/cryptobot-email/blob/master/doc/getting_started/README.md">Check out this guide</a> to get get you started, and then try sending me another email.</p>
       {% elif encrypted_right and signed and pubkey_included %}
-      <p>Congradulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.</p>
+      <p>Congratulations, you're using PGP correctly! Now you might want to learn about what key servers are for, what PGP fingerprints are and why they're important, and about signing keys and the web of trust.</p>
       {% endif %}
 
       {% if signed %}
