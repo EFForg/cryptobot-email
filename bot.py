@@ -321,7 +321,7 @@ class EmailFetcher(object):
 class EmailSender(object):
     """Encrypt, sign & send emails
 
-    Creating an instance of this class will send emails by calling :meth:`construct_and_send_email`
+    Creating an instance of this class **will send emails** by calling :meth:`construct_and_send_email`
 
     :ivar message: the *received* :class:`OpenPGPMessage` email
     :ivar env: Jinja template environment
@@ -538,6 +538,12 @@ class OpenPGPMessage(Message):
         return self._message_id
 
     def _find_email_payload_matches(self, payload_test):
+        """find message parts containing a string
+
+        :arg str payload_test: the string to search for
+        :rtype: list
+        :returns: matching message parts
+        """
         matches = []
         for content_type, payload in self._parts:
             if content_type in self._content_types:
@@ -546,6 +552,7 @@ class OpenPGPMessage(Message):
         return matches
 
     def _parse_for_openpgp(self):
+        """parse email for PGP artifacts"""
         self._encrypted_right       = False
         self._encrypted_wrong       = False
         self._signed                = False
@@ -616,6 +623,13 @@ class OpenPGPMessage(Message):
                         self._pubkey_fingerprint = valid_fingerprint
 
     def _find_pubkeys(self, s):
+        """find public key substrings
+
+        :arg str s: the string to search in
+        :rtype: list of str
+        :returns: armored public keys
+        """
+
         pubkeys = []
 
         in_block = False
