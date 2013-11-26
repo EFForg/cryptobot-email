@@ -9,8 +9,12 @@ Welcome to Cryptobot Email's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   installation
+   usage
+   api
+   changelog
 
 
 Indices and tables
