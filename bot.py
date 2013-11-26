@@ -652,6 +652,11 @@ class OpenPGPMessage(Message):
         return self._pubkey_fingerprint
 
 def main(fp):
+    """main entry point, sorta. Fetches & replies to emails, etc..
+
+    :arg str fp: fingerprint of the bot itself
+    """
+    # XXX rename fp to fingerprint
     # jinja2
     template_loader = jinja2.FileSystemLoader(searchpath="templates")
     template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
