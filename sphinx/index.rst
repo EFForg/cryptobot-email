@@ -6,7 +6,16 @@
 Welcome to Cryptobot Email's documentation!
 ===========================================
 
-Contents:
+.. image:: cryptobot-large.png
+
+CryptoBot Email is an email bot that helps people learn how to use OpenPGP.
+You send CryptoBot a PGP-encrypted and signed email (probably using GnuPG)
+and it responds telling you how you do, and offering advice.
+
+:author: Micah Lee & the EFF tech team
+:license: Affero GPL v3
+:versions: Python 2.7
+:homepage: https://github.com/EFForg/cryptobot-email
 
 .. toctree::
    :maxdepth: 1
