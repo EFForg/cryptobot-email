@@ -525,6 +525,10 @@ class OpenPGPMessage(Message):
 
     @property
     def message_id(self):
+        """the message ID
+
+        :type: str
+        """
         return self._message_id
 
     def _find_email_payload_matches(self, payload_test):
@@ -625,14 +629,26 @@ class OpenPGPMessage(Message):
 
     @property
     def encrypted_right(self):
+        """is message encrypted correctly?
+
+        :type: bool
+        """
         return self._encrypted_right
 
     @property
     def encrypted_wrong(self):
+        """is message encrypted incorrectly?
+
+        :type: bool
+        """
         return self._encrypted_wrong
 
     @property
     def signed(self):
+        """is message signed?
+
+        :type: bool
+        """
         return self._signed
 
     @property
@@ -641,14 +657,26 @@ class OpenPGPMessage(Message):
 
     @property
     def pubkey_included(self):
+        """is public key included in message?
+
+        :type: bool
+        """
         return self._pubkey_included
 
     @property
     def pubkey_included_wrong(self):
+        """is public key incorrectly included in message?
+
+        :type: bool
+        """
         return self._pubkey_included_wrong
 
     @property
     def pubkey_fingerprint(self):
+        """fingerprint of public key attached to message, or False if none found
+
+        :type: str
+        """
         return self._pubkey_fingerprint
 
 def main(fp):
