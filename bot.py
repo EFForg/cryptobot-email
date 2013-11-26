@@ -223,6 +223,13 @@ class GnuPG(object):
         return out, err
 
 class EmailFetcher(object):
+    """retrieve email from IMAP or maildir
+
+    :ivar bool use_maildir: use maildir or IMAP
+    :ivar imap_mail: IMAP server connection
+    """
+    # XXX this should be two (sub)classes, instead of dispatching on a flag
+
     def __init__(self, use_maildir=False):
         self.use_maildir = use_maildir
 
@@ -230,14 +237,28 @@ class EmailFetcher(object):
             self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
 
     def __del__(self):
+        # XXX this should be called explicitly. Avoid __del__!
         if not self.use_maildir:
             self.imap_mail.expunge()
 
     def login(self, username, password, imap_server):
+        """login to IMAP server. For internal use.
+
+        :arg str username: IMAP username
+        :arg str password: IMAP password
+        :arg str imap_server: hostname of IMAP server
+        """
+        # XXX should this take port & key/cert files for IMAP server? meh
         self.imap_mail = imaplib.IMAP4_SSL(imap_server)
         self.imap_mail.login(username, password)
 
     def get_maildir_mail(self):
+        """retrieve emails from a maildir. For internal use.
+
+        Mails will be deleted after reading.
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
         # Note: there is an issue where if msg is rfc822.Message,
         # then str(msg) does not print the full message. Hence trying
         # to use Maildir to import Messages, then get their string representations
@@ -247,6 +268,7 @@ class EmailFetcher(object):
         emails = []
         for file_path in os.walk(config.MAILDIR):
             for f in file_path[2]:
+                # XXX why this extension?
                 if (f.endswith('openpgpbot')):
                     # this is a new email, and a horrible hack
                     # todo: more elegantly get file path
@@ -254,9 +276,15 @@ class EmailFetcher(object):
                     emails.append(OpenPGPMessage(open(full_file_path).read(), f.split('.')[0]))
                     os.remove(full_file_path)
         # todo delete email!
+        # XXX bad comment? ^^ we're already deleting mails
         return emails
 
     def get_imap_mail(self):
+        """retrieve emails from an IMAP server. For internal use.
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
+        # XXX check `result` for OK?
         self.imap_mail.select("inbox")
         # Get all email in the inbox (with uids instead of sequential ids)
         result, data = self.imap_mail.uid('search', None, "ALL")
@@ -271,12 +299,20 @@ class EmailFetcher(object):
         return messages
 
     def get_all_mail(self):
+        """retrieve emails
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
         if self.use_maildir:
             return self.get_maildir_mail()
         else:
             return self.get_imap_mail()
 
     def delete(self, message_id):
+        """delete an email. Only works with IMAP
+
+        :arg str message_id: the message ID of email to delete
+        """
         if self.use_maildir:
             pass
         else:
