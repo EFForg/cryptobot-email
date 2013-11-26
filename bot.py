@@ -482,7 +482,6 @@ class EmailSender(object):
         :arg str from_email: From: address
         :arg str to_email: To: address
         """
-
         if config.SMTP_SERVER == 'localhost':
             s = smtplib.SMTP(config.SMTP_SERVER)
         else:
@@ -670,7 +669,13 @@ def main(fp):
         fetcher.delete(message.message_id)
 
 def check_bot_keypair(allow_new_key):
-    """Make sure the bot has a keypair. If it doesn't, create one if allow_new_key is true."""
+    """Ensure the bot has a keypair, possibly creating a new one
+
+    :arg bool allow_new_key: should new keypair be created if no existing one found
+    :rtype: str
+    :returns: fingerprint of the bot's keypair
+    :raises: ValueError if no keypair found
+    """
     gpg = GnuPG()
 
     expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
