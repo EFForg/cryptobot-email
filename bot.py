@@ -503,6 +503,12 @@ class OpenPGPMessage(Message):
     """Email message with OpenPGP-specific properties"""
 
     def __init__(self, message, message_id=None, gpg=None):
+        """
+        :arg str message: raw text of the email
+        :arg str message_id: IMAP message ID or maildir message path
+        :arg gpg: :class:`GnuPG` instance or None (which will create one)
+        """
+
         Message.__init__(self, message)
         self._message_id = message_id
         if not gpg:
