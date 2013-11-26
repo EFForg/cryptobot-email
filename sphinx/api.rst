@@ -5,4 +5,3 @@ bot
 ---
 
 .. automodule:: bot
-    :members:
