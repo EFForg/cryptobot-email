@@ -319,6 +319,18 @@ class EmailFetcher(object):
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
+    """Encrypt, sign & send emails
+
+    Creating an instance of this class will send emails by calling :meth:`construct_and_send_email`
+
+    :ivar message: the *received* :class:`OpenPGPMessage` email
+    :ivar env: Jinja template environment
+    :ivar str fp: the fingerprint for the bot itself
+    :ivar html_template: Jinja template for HTML part of response
+    :ivar txt_template: Jinja template for HTML part of response
+    """
+    # XXX rename fp to fingerprint
+
     def __init__(self, message, env, fp):
         self.message = message
         self.env = env
@@ -332,6 +344,11 @@ class EmailSender(object):
         self.construct_and_send_email()
 
     def as_string(self, msg):
+        """convert message to a string. For internal use.
+
+        :arg msg: :class:`OpenPGPMessage` to be stringified
+        :rtype: str
+        """
         # using this instead of msg.as_string(), because the header wrapping was causing sig verification problems
         # http://docs.python.org/2/library/email.message.html#email.message.Message.as_string
         fp = StringIO()
@@ -341,6 +358,7 @@ class EmailSender(object):
         return text
 
     def construct_and_send_email(self):
+        """Do work of constructing & sending reply email. For internal use."""
         # who to respond to?
         to_email = None
         if 'Reply-To' in self.message:
@@ -349,7 +367,7 @@ class EmailSender(object):
             to_email = self.message['From']
         if not to_email:
             print 'Cannot decide who to respond to '
-            return
+            return # XXX throw exception instead
 
         # what the response subject should be
         if 'Subject' in self.message:
@@ -451,7 +469,6 @@ class EmailSender(object):
             wrapper['To'] = to_email
 
             final_message = self.as_string(wrapper)
-
         else:
             final_message = signed_string
 
@@ -459,6 +476,13 @@ class EmailSender(object):
         print 'Responded to {0} {1}'.format(self.message['From'], str(template_vars))
 
     def send_email(self, msg_string, from_email, to_email):
+        """Send email via SMTP. For internal use.
+
+        :arg str msg_string: strigified reply email
+        :arg str from_email: From: address
+        :arg str to_email: To: address
+        """
+
         if config.SMTP_SERVER == 'localhost':
             s = smtplib.SMTP(config.SMTP_SERVER)
         else:
