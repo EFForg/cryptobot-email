@@ -37,6 +37,9 @@ nosetests.xml
 # Virtualenv
 env/
 
+# Sphinx
+sphinx/_build
+
 # Vim
 *.swp
 

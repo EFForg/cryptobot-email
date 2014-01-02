@@ -31,22 +31,39 @@ except ImportError:
     sys.exit(1)
 
 class GnuPG(object):
+    """A wrapper around ``gpg`` executable
+
+    This class implements no crypto itself; rather, it just calls ``gpg``
+    with reasonable options.
+
+    :ivar homedir: the GPG home directory. Will be created if it doesn't exist.
+    """
     def __init__(self, homedir=False):
         self.homedir = homedir or config.GPG_HOMEDIR
         if not os.path.exists(self.homedir):
             os.mkdir(self.homedir, 0700)
+        # XXX check permissions on existing directory and fix (or at least warn)?
 
     def export_keys(self, fingerprint):
-        """Returns an ascii armorer public key block, or False"""
+        """Export an ascii-armored public key block
+
+        :arg str fingerprint: the fingerprint of the key
+        :rtype: str
+        :returns: exported block; False if fingerprint not found or other error
+        """
         out, err = self._gpg(['--armor', '--no-emit-version', '--export', fingerprint])
         if out == 'gpg: WARNING: nothing exported\n':
             return False
         else:
             return out
-    
-    def import_keys(self, pubkey):
-        """Imports a public key block and returns a fingerprint, or False of invalid pubkey"""
 
+    def import_keys(self, pubkey):
+        """Import a public key block
+
+        :arg str pubkey: the public key
+        :rtype: str
+        :returns: fingerprint of the pubkey; False of invalid pubkey
+        """
         # figure out the fingerprint of the key
         fingerprint = False
         out, err = self._gpg(['--with-fingerprint'], pubkey)
@@ -61,17 +78,28 @@ class GnuPG(object):
         return fingerprint
 
     def decrypt(self, ciphertext):
-        """Attempts to decrypt ciphertext block, returns type (plaintext, signed (bool)) or False if decryption fails"""
+        """Decrypt a ciphertext block to plaintext
+
+        :arg str ciphertext: the encrypted bits
+        :rtype: 2-tuple of (str, bool)
+        :returns: 2-tuple of (plaintext, is_signed); False if decryption fails
+        """
         out, err = self._gpg(['--decrypt'], ciphertext)
-        
+
         if 'secret key not available' in err:
             return False, False
-        
+
         signed = 'Good signature from' in err
         return out, signed
-    
+
     def encrypt(self, plaintext, fingerprint):
-        """Encrypts plaintext, returns ciphertext"""
+        """Encrypts plaintext to a ciphertext block
+
+        :arg str plaintext: the plaintext bits to be encrypted
+        :arg str fingerprint: the fingerprint of the user to whom we should encrypt
+        :rtype: str
+        :returns: the encrypted bits; False on error
+        """
         out, err = self._gpg(['--armor', '--batch', '--trust-model', 'always', '--encrypt', '--recipient', fingerprint], plaintext)
 
         if 'encryption failed' in err:
@@ -80,7 +108,11 @@ class GnuPG(object):
         return out
 
     def sign(self, message):
-        """Signs message and returns ASCII armored sig"""
+        """Sign a message
+
+        :arg str message: the text to sign
+        :rtype: str
+        :returns: ASCII armored signature"""
 
         # note, this assumes you only have 1 secret key in your keyring.
         # it might make sense to add --default-key FINGERPRINT later.
@@ -88,35 +120,40 @@ class GnuPG(object):
         return out
 
     def has_secret_key_with_uid(self, uid):
-        """Searches secret keys for uid, and if it finds one returns the fingerprint, otherwise False"""
-        
+        """Searches secret keys for a uid
+
+        :arg str uid: the user id to search for
+        :rtype: str
+        :returns: fingerprint if uid was found; else False
         """
-        When running gpg --list-secret-keys --with-colons --fingerprint, here is some sample output.
+        ## When running gpg --list-secret-keys --with-colons --fingerprint, here is some sample output.
 
-        sec::4096:1:061BDEF98CCDA4FA:2013-11-05::::CryptoBot Email <wsmfzz62@gmail.com>:::
-        fpr:::::::::78C9B0F7289B460C823A2102061BDEF98CCDA4FA:
+        ## sec::4096:1:061BDEF98CCDA4FA:2013-11-05::::CryptoBot Email <wsmfzz62@gmail.com>:::
+        ## fpr:::::::::78C9B0F7289B460C823A2102061BDEF98CCDA4FA:
 
-        Or, for more complicated output:
+        ## Or, for more complicated output:
 
-        sec::4096:1:B4D25A1E99999697:2011-06-24:2014-09-18:::Micah Lee <micah@eff.org>:::
-        fpr:::::::::5C17616361BD9F92422AC08BB4D25A1E99999697:
-        uid:::::::21C57F8639CA1D1D9A9F3BE78129ED0043C11693::Micah Lee <micahflee@gmail.com>:
-        uid:::::::BEE1517245C07B111BEFC41EEB1CDEE5DF0847E0::Micah Lee <micahflee@riseup.net>:
-        uid:::::::7573A1517811E970A01B05BCE2E48DD8FEFE647E::Micah Lee <micah@pressfreedomfoundation.org>:
-        uid:::::::763D70011F3C02DD325865D92960346A49D07F4C::Micah Lee <micah@micahflee.com>:
-        ssb::4096:1:CE8CDD55E8839F99:2011-06-24:::::::
-        sec::2048:1:AF878F07E341E711:2012-02-24::::EFF Webmaster <webmaster@eff.org>:::
-        fpr:::::::::1729DC3DB3F635D25B316984AF878F07E341E711:
-        ssb::2048:1:80939142EB82ABA7:2012-02-24:::::::
+        ## sec::4096:1:B4D25A1E99999697:2011-06-24:2014-09-18:::Micah Lee <micah@eff.org>:::
+        ## fpr:::::::::5C17616361BD9F92422AC08BB4D25A1E99999697:
+        ## uid:::::::21C57F8639CA1D1D9A9F3BE78129ED0043C11693::Micah Lee <micahflee@gmail.com>:
+        ## uid:::::::BEE1517245C07B111BEFC41EEB1CDEE5DF0847E0::Micah Lee <micahflee@riseup.net>:
+        ## uid:::::::7573A1517811E970A01B05BCE2E48DD8FEFE647E::Micah Lee <micah@pressfreedomfoundation.org>:
+        ## uid:::::::763D70011F3C02DD325865D92960346A49D07F4C::Micah Lee <micah@micahflee.com>:
+        ## ssb::4096:1:CE8CDD55E8839F99:2011-06-24:::::::
+        ## sec::2048:1:AF878F07E341E711:2012-02-24::::EFF Webmaster <webmaster@eff.org>:::
+        ## fpr:::::::::1729DC3DB3F635D25B316984AF878F07E341E711:
+        ## ssb::2048:1:80939142EB82ABA7:2012-02-24:::::::
 
-        This loops through the output looking for a valid uid. If it finds one, it returns the fingerprint
-        from the fpr line associated with that keypair. If the valid uid is the primary id, it's listed
-        in the sec line (before fpr), but if it's a different uid it's listed in a uid line (after fpr).
-        So it's confusing, but this seems to work.
-        """
-        
+        ## This loops through the output looking for a valid uid. If it finds
+        ## one, it returns the fingerprint from the fpr line associated with
+        ## that keypair. If the valid uid is the primary id, it's listed in
+        ## the sec line (before fpr), but if it's a different uid it's listed
+        ## in a uid line (after fpr). So it's confusing, but this seems to
+        ## work.
+
+
         out, err = self._gpg(['--list-secret-keys', '--with-colons', '--fingerprint'])
-        
+
         return_fp = False
         cur_fp = ''
         for line in out.split('\n'):
@@ -132,7 +169,13 @@ class GnuPG(object):
         return False
 
     def has_public_key_with_uid(self, fingerprint, uid):
-        """Searches public key with fingerprint for uid and returns True if found, otherwise returns False"""
+        """Searches fingerprint's keyring for a uid
+
+        :arg str fingerprint: the fingerprint of the keyring to search
+        :arg str uid: the user id to search for
+        :rtype: bool
+        :returns: True if found
+        """
         out, err = self._gpg(['--list-keys', '--with-colons', fingerprint])
         for line in out.split('\n'):
             if line[0:3] == 'pub' or line[0:3] == 'uid':
@@ -141,8 +184,14 @@ class GnuPG(object):
         return False
 
     def gen_key(self, name, email, key_length=4096):
-        """Generate a key, returns its key ID"""
-        
+        """Generate a new key
+
+        :arg str name: human-readable name of the key
+        :arg str email: an email address for the key
+        :arg int key_length: how many bits should the key be
+        :rtype: str
+        :returns: key ID of generated key"""
+
         # make input variable to pass into gpg
         input  = "Key-Type: RSA\n"
         input += "Key-Length: "+str(key_length)+"\n"
@@ -160,12 +209,27 @@ class GnuPG(object):
         return keyid
 
     def _gpg(self, args, input=None):
+        """Helper function that calls ``gpg``. For internal use.
+
+        :arg list args: list of additional commandline options
+        :arg str input: string to feed to ``gpg`` stdin
+        :rtype: 2-tuple of str
+        :returns: 2-tuple of (stdout, stderr) from ``gpg`` call
+        """
+
         gpg_args = ['gpg', '--homedir', self.homedir, '--no-tty'] + args
         p = subprocess.Popen(gpg_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate(input)
         return out, err
 
 class EmailFetcher(object):
+    """retrieve email from IMAP or maildir
+
+    :ivar bool use_maildir: use maildir or IMAP
+    :ivar imap_mail: IMAP server connection
+    """
+    # XXX this should be two (sub)classes, instead of dispatching on a flag
+
     def __init__(self, use_maildir=False):
         self.use_maildir = use_maildir
 
@@ -173,23 +237,38 @@ class EmailFetcher(object):
             self.login(config.IMAP_USERNAME, config.IMAP_PASSWORD, config.IMAP_SERVER)
 
     def __del__(self):
+        # XXX this should be called explicitly. Avoid __del__!
         if not self.use_maildir:
             self.imap_mail.expunge()
 
     def login(self, username, password, imap_server):
+        """login to IMAP server. For internal use.
+
+        :arg str username: IMAP username
+        :arg str password: IMAP password
+        :arg str imap_server: hostname of IMAP server
+        """
+        # XXX should this take port & key/cert files for IMAP server? meh
         self.imap_mail = imaplib.IMAP4_SSL(imap_server)
         self.imap_mail.login(username, password)
 
     def get_maildir_mail(self):
+        """retrieve emails from a maildir. For internal use.
+
+        Mails will be deleted after reading.
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
         # Note: there is an issue where if msg is rfc822.Message,
         # then str(msg) does not print the full message. Hence trying
         # to use Maildir to import Messages, then get their string representations
         # to import into OpenPGPMessage failed, as did importing directly
-        # since OpenPGPMessage expects a string. Instead we use os.walk to 
+        # since OpenPGPMessage expects a string. Instead we use os.walk to
         # get Maildir files directly
         emails = []
         for file_path in os.walk(config.MAILDIR):
             for f in file_path[2]:
+                # XXX why this extension?
                 if (f.endswith('openpgpbot')):
                     # this is a new email, and a horrible hack
                     # todo: more elegantly get file path
@@ -197,9 +276,15 @@ class EmailFetcher(object):
                     emails.append(OpenPGPMessage(open(full_file_path).read(), f.split('.')[0]))
                     os.remove(full_file_path)
         # todo delete email!
+        # XXX bad comment? ^^ we're already deleting mails
         return emails
 
     def get_imap_mail(self):
+        """retrieve emails from an IMAP server. For internal use.
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
+        # XXX check `result` for OK?
         self.imap_mail.select("inbox")
         # Get all email in the inbox (with uids instead of sequential ids)
         result, data = self.imap_mail.uid('search', None, "ALL")
@@ -214,31 +299,56 @@ class EmailFetcher(object):
         return messages
 
     def get_all_mail(self):
+        """retrieve emails
+
+        :rtype: list of :class:`OpenPGPMessage`
+        """
         if self.use_maildir:
             return self.get_maildir_mail()
         else:
             return self.get_imap_mail()
 
     def delete(self, message_id):
+        """delete an email. Only works with IMAP
+
+        :arg str message_id: the message ID of email to delete
+        """
         if self.use_maildir:
             pass
         else:
             self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
 
 class EmailSender(object):
+    """Encrypt, sign & send emails
+
+    Creating an instance of this class **will send emails** by calling :meth:`construct_and_send_email`
+
+    :ivar message: the *received* :class:`OpenPGPMessage` email
+    :ivar env: Jinja template environment
+    :ivar str fp: the fingerprint for the bot itself
+    :ivar html_template: Jinja template for HTML part of response
+    :ivar txt_template: Jinja template for HTML part of response
+    """
+    # XXX rename fp to fingerprint
+
     def __init__(self, message, env, fp):
         self.message = message
         self.env = env
         self.fp = fp
-         
+
         self.html_template = self.env.get_template('email_template.html')
         self.txt_template = self.env.get_template('email_template.txt')
-        
+
         self._gpg = GnuPG()
 
         self.construct_and_send_email()
 
     def as_string(self, msg):
+        """convert message to a string. For internal use.
+
+        :arg msg: :class:`OpenPGPMessage` to be stringified
+        :rtype: str
+        """
         # using this instead of msg.as_string(), because the header wrapping was causing sig verification problems
         # http://docs.python.org/2/library/email.message.html#email.message.Message.as_string
         fp = StringIO()
@@ -248,6 +358,7 @@ class EmailSender(object):
         return text
 
     def construct_and_send_email(self):
+        """Do work of constructing & sending reply email. For internal use."""
         # who to respond to?
         to_email = None
         if 'Reply-To' in self.message:
@@ -256,7 +367,7 @@ class EmailSender(object):
             to_email = self.message['From']
         if not to_email:
             print 'Cannot decide who to respond to '
-            return
+            return # XXX throw exception instead
 
         # what the response subject should be
         if 'Subject' in self.message:
@@ -292,7 +403,7 @@ class EmailSender(object):
         html_part = MIMEBase('text', 'html')
         html_part.set_payload(body_html)
         encode_quopri(html_part)
-        
+
         body.attach(html_part)
         msg.attach(body)
 
@@ -321,13 +432,13 @@ class EmailSender(object):
         signed = MIMEMultipart(_subtype="signed", micalg="pgp-sha1", protocol="application/pgp-signature")
         signed.attach(msg)
         signed.attach(sig_part)
-        
+
         # if we're just signing and not encrypting this message, add the headers directly to the signed part
         if not self.message.pubkey_fingerprint:
             signed['Subject'] = subject
             signed['From'] = from_email
             signed['To'] = to_email
-        
+
         # need to add a '\r\n' right before the sig part (#19)
         # because of this bug http://bugs.python.org/issue14983
         signed_string = self.as_string(signed)
@@ -358,7 +469,6 @@ class EmailSender(object):
             wrapper['To'] = to_email
 
             final_message = self.as_string(wrapper)
-
         else:
             final_message = signed_string
 
@@ -366,6 +476,12 @@ class EmailSender(object):
         print 'Responded to {0} {1}'.format(self.message['From'], str(template_vars))
 
     def send_email(self, msg_string, from_email, to_email):
+        """Send email via SMTP. For internal use.
+
+        :arg str msg_string: strigified reply email
+        :arg str from_email: From: address
+        :arg str to_email: To: address
+        """
         if config.SMTP_SERVER == 'localhost':
             s = smtplib.SMTP(config.SMTP_SERVER)
         else:
@@ -378,7 +494,7 @@ class EmailSender(object):
     def sign_body(self):
         # need to implement PGP/MIME to sign the body here
         pass
-    
+
     def encrypt_body(self):
         # need to implement PGP/MIME to sign the body here
         pass
@@ -387,6 +503,12 @@ class OpenPGPMessage(Message):
     """Email message with OpenPGP-specific properties"""
 
     def __init__(self, message, message_id=None, gpg=None):
+        """
+        :arg str message: raw text of the email
+        :arg str message_id: IMAP message ID or maildir message path
+        :arg gpg: :class:`GnuPG` instance or None (which will create one)
+        """
+
         Message.__init__(self, message)
         self._message_id = message_id
         if not gpg:
@@ -394,8 +516,8 @@ class OpenPGPMessage(Message):
         else:
             self._gpg = gpg
 
-        self._content_types = ["text/plain", "text/html", 
-            "application/pgp-signature", "application/pgp-keys", 
+        self._content_types = ["text/plain", "text/html",
+            "application/pgp-signature", "application/pgp-keys",
             "application/octet-stream"]
 
         self._parts = []
@@ -409,9 +531,19 @@ class OpenPGPMessage(Message):
 
     @property
     def message_id(self):
+        """the message ID
+
+        :type: str
+        """
         return self._message_id
 
     def _find_email_payload_matches(self, payload_test):
+        """find message parts containing a string
+
+        :arg str payload_test: the string to search for
+        :rtype: list
+        :returns: matching message parts
+        """
         matches = []
         for content_type, payload in self._parts:
             if content_type in self._content_types:
@@ -420,13 +552,14 @@ class OpenPGPMessage(Message):
         return matches
 
     def _parse_for_openpgp(self):
+        """parse email for PGP artifacts"""
         self._encrypted_right       = False
         self._encrypted_wrong       = False
         self._signed                = False
         self._pubkey_included       = False
         self._pubkey_included_wrong = False
         self._pubkey_fingerprint    = False
-         
+
         encrypted_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_MESSAGE)
         if encrypted_parts:
             if len(encrypted_parts) > 1:
@@ -441,7 +574,7 @@ class OpenPGPMessage(Message):
 
                 if signed:
                     self._signed = True
-        
+
         signed_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_SIGNATURE)
         if signed_parts:
             if len(signed_parts) > 1:
@@ -449,7 +582,7 @@ class OpenPGPMessage(Message):
                 print "More than one signed part in this message. That's weird..."
             self._signed = True
             # todo: check signature, public key attached, etc
-        
+
         pubkey_parts = self._find_email_payload_matches(PGP_ARMOR_HEADER_PUBKEY)
         if pubkey_parts:
             # find all the pubkeys
@@ -469,7 +602,7 @@ class OpenPGPMessage(Message):
                     if fingerprint:
                         fingerprints.append(fingerprint)
                 fingerprints = list(set(fingerprints))
-                
+
                 if len(fingerprints) == 0:
                     self._pubkey_included_wrong = True
                 else:
@@ -490,6 +623,13 @@ class OpenPGPMessage(Message):
                         self._pubkey_fingerprint = valid_fingerprint
 
     def _find_pubkeys(self, s):
+        """find public key substrings
+
+        :arg str s: the string to search in
+        :rtype: list of str
+        :returns: armored public keys
+        """
+
         pubkeys = []
 
         in_block = False
@@ -504,19 +644,31 @@ class OpenPGPMessage(Message):
                 in_block = False
                 pubkeys.append(pubkey)
                 pubkey = ""
-        
+
         return pubkeys
 
     @property
     def encrypted_right(self):
+        """is message encrypted correctly?
+
+        :type: bool
+        """
         return self._encrypted_right
-    
+
     @property
     def encrypted_wrong(self):
+        """is message encrypted incorrectly?
+
+        :type: bool
+        """
         return self._encrypted_wrong
 
     @property
     def signed(self):
+        """is message signed?
+
+        :type: bool
+        """
         return self._signed
 
     @property
@@ -525,17 +677,34 @@ class OpenPGPMessage(Message):
 
     @property
     def pubkey_included(self):
+        """is public key included in message?
+
+        :type: bool
+        """
         return self._pubkey_included
-    
+
     @property
     def pubkey_included_wrong(self):
+        """is public key incorrectly included in message?
+
+        :type: bool
+        """
         return self._pubkey_included_wrong
-    
+
     @property
     def pubkey_fingerprint(self):
+        """fingerprint of public key attached to message, or False if none found
+
+        :type: str
+        """
         return self._pubkey_fingerprint
 
 def main(fp):
+    """main entry point, sorta. Fetches & replies to emails, etc..
+
+    :arg str fp: fingerprint of the bot itself
+    """
+    # XXX rename fp to fingerprint
     # jinja2
     template_loader = jinja2.FileSystemLoader(searchpath="templates")
     template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
@@ -553,11 +722,17 @@ def main(fp):
         fetcher.delete(message.message_id)
 
 def check_bot_keypair(allow_new_key):
-    """Make sure the bot has a keypair. If it doesn't, create one if allow_new_key is true."""
+    """Ensure the bot has a keypair, possibly creating a new one
+
+    :arg bool allow_new_key: should new keypair be created if no existing one found
+    :rtype: str
+    :returns: fingerprint of the bot's keypair
+    :raises: ValueError if no keypair found
+    """
     gpg = GnuPG()
 
     expected_uid = '{0} <{1}>'.format(config.PGP_NAME, config.PGP_EMAIL)
-    
+
     fingerprint = gpg.has_secret_key_with_uid(expected_uid)
     if not fingerprint:
         if allow_new_key:
