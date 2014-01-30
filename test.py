@@ -5,6 +5,7 @@ import unittest
 import bot
 import email
 import random
+import sys
 
 class GnuPGTest(unittest.TestCase):
     def setUp(self):
@@ -65,8 +66,10 @@ class GnuPGTest(unittest.TestCase):
         expected_uid = 'OpenPGPBot Test Suite (insecure) <invalid_and_insecure@openpgpbot.eff.org>'
         self.assertTrue(self.gpg.has_public_key_with_uid('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', expected_uid))
         self.assertFalse(self.gpg.has_public_key_with_uid('0D4AF6E8D289BDE46594D41255BB44BA0D3E5387', 'fluff'))
-    
+
+    @unittest.skipUnless('--slow' in sys.argv, "Skippings slow key generation")
     def test_gen_key(self):
+        print >>sys.stderr, "\nTesting key generation. This may take some time.\n"
         random.seed()
         r = random.random()
         name = 'Test '+str(r)
@@ -158,4 +161,8 @@ class BotTest(unittest.TestCase):
         self.assertTrue(msg.pubkey_included)
 
 if __name__ == '__main__':
+    try:
+        sys.argv.remove('--slow')
+    except ValueError:
+        pass
     unittest.main()
