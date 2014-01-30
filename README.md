@@ -38,6 +38,11 @@ To run the tests:
 
     $ ./test.py
 
+By default, the tests skip key generation, which can be slow and use up
+entropy. To include these tests, run:
+
+    $ ./test.py --slow
+
 Relevant specs:
 
 * [RFC 4880 - OpenPGP Message Format](http://tools.ietf.org/html/rfc4880)
