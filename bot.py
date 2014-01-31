@@ -266,15 +266,13 @@ class EmailFetcher(object):
         # since OpenPGPMessage expects a string. Instead we use os.walk to
         # get Maildir files directly
         emails = []
-        for file_path in os.walk(config.MAILDIR):
+        for file_path in os.walk(os.path.join(config.MAILDIR, "new")):
             for f in file_path[2]:
-                # XXX why this extension?
-                if (f.endswith('openpgpbot')):
-                    # this is a new email, and a horrible hack
-                    # todo: more elegantly get file path
-                    full_file_path = os.path.join(config.MAILDIR, 'new', f)
-                    emails.append(OpenPGPMessage(open(full_file_path).read(), f.split('.')[0]))
-                    os.remove(full_file_path)
+                # this is a new email, and a horrible hack
+                # todo: more elegantly get file path
+                full_file_path = os.path.join(config.MAILDIR, "new", f)
+                emails.append(OpenPGPMessage(open(full_file_path).read(), f.split('.')[0]))
+                os.remove(full_file_path)
         # todo delete email!
         # XXX bad comment? ^^ we're already deleting mails
         return emails
