@@ -6,6 +6,7 @@ import bot
 import email
 import random
 import sys
+import jinja2
 
 class GnuPGTest(unittest.TestCase):
     def setUp(self):
@@ -159,6 +160,43 @@ class BotTest(unittest.TestCase):
         msg = bot.OpenPGPMessage(self.emails['encrypted_pubkey_inline'], gpg=self.gpg)
         self.assertTrue(msg.encrypted_right)
         self.assertTrue(msg.pubkey_included)
+
+class EmailSenderTest(unittest.TestCase):
+
+    def setUp(self):
+        self.reply_body = None
+        self.reply_from = None
+        self.reply_to = None
+        template_loader = jinja2.FileSystemLoader(searchpath="templates")
+        self.env = jinja2.Environment(loader=template_loader, trim_blocks=True)
+
+
+        # test keys
+        self.public_key = open('test/keys/public.key').read()
+        self.private_key = open('test/keys/private.key').read()
+        # set up test keyring
+        self.gpg = bot.GnuPG("test/homedir")
+        self.gpg.import_keys(self.public_key)
+        self.gpg.import_keys(self.private_key)
+ 
+        # set up tester
+        self.emails = {}
+        for filename in os.listdir('test/emails/'):
+            self.emails[filename] = email.message_from_string(open('test/emails/'+filename).read())
+
+    def get_mock_sender(outer_self):
+        def mock_sender(msg_string, from_email, to_email, s=outer_self):
+            s.reply_body = msg_string
+            s.reply_from = from_email
+            s.reply_to = to_email
+        return mock_sender
+
+    def test_unencrypted_message_reply_address(self):
+        msg = bot.OpenPGPMessage(self.emails['unencrypted_thunderbird'],
+                                 gpg=self.gpg)
+        bot.EmailSender(msg, self.env, fp= '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387',  sender=self.get_mock_sender())
+        self.assertTrue('justtesting@example.com' in self.reply_to)
+
 
 if __name__ == '__main__':
     try:

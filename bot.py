@@ -328,13 +328,17 @@ class EmailSender(object):
     :ivar str fp: the fingerprint for the bot itself
     :ivar html_template: Jinja template for HTML part of response
     :ivar txt_template: Jinja template for HTML part of response
+    ;ivar sender: function to actually send email. Defaults to self.send_email(self, msg_string, from_email, to_email)
     """
     # XXX rename fp to fingerprint
 
-    def __init__(self, message, env, fp):
+    def __init__(self, message, env, fp, sender=None):
         self.message = message
         self.env = env
         self.fp = fp
+        if not sender:
+            sender = self.send_email
+        self.sender = sender
 
         self.html_template = self.env.get_template('email_template.html')
         self.txt_template = self.env.get_template('email_template.txt')
@@ -472,10 +476,11 @@ class EmailSender(object):
         else:
             final_message = signed_string
 
-        self.send_email(final_message, from_email, to_email)
+        self.sender(final_message, from_email, to_email)
         print 'Responded to {0} {1}'.format(self.message['From'], str(template_vars))
 
-    def send_email(self, msg_string, from_email, to_email):
+    @staticmethod
+    def send_email(msg_string, from_email, to_email):
         """Send email via SMTP. For internal use.
 
         :arg str msg_string: strigified reply email
