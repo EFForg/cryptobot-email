@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#printi!/usr/bin/env python
 """
 An email bot to help you learn OpenPGP!
 """
@@ -18,16 +18,18 @@ import email
 import jinja2
 import rfc822
 import quopri
+import logging
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
 PGP_ARMOR_HEADER_PUBKEY    = "-----BEGIN PGP PUBLIC KEY BLOCK-----"
 PGP_ARMOR_FOOTER_PUBKEY    = "-----END PGP PUBLIC KEY BLOCK-----"
 
+
 try:
     import config
 except ImportError:
-    print >> sys.stderr, "Error: could not load configuration from config.py"
+    logging.error("Error: could not load configuration from config.py")
     sys.exit(1)
 
 class GnuPG(object):
@@ -370,7 +372,7 @@ class EmailSender(object):
         elif 'From' in self.message:
             to_email = self.message['From']
         if not to_email:
-            print 'Cannot decide who to respond to '
+            logging.error('Cannot decide who to respond to in %s' % (self.message_id()))
             return # XXX throw exception instead
 
         # what the response subject should be
@@ -477,7 +479,7 @@ class EmailSender(object):
             final_message = signed_string
 
         self.sender(final_message, from_email, to_email)
-        print 'Responded to {0} {1}'.format(self.message['From'], str(template_vars))
+        logging.info('Responded to {0} {1}'.format(self.message['From'], str(template_vars)))
 
     @staticmethod
     def send_email(msg_string, from_email, to_email):
@@ -569,7 +571,7 @@ class OpenPGPMessage(Message):
         if encrypted_parts:
             if len(encrypted_parts) > 1:
                 # todo: raise error here?
-                print "More than one encrypted part in this message. That's weird..."
+                logging.warning("More than one encrypted part in this message. That's weird... {0}".format(self.message_id()))
             self._decrypted_text, signed = self._gpg.decrypt(encrypted_parts[0])
             if not self._decrypted_text:
                 self._encrypted_wrong = True
@@ -584,7 +586,7 @@ class OpenPGPMessage(Message):
         if signed_parts:
             if len(signed_parts) > 1:
                 # todo: raise error here?
-                print "More than one signed part in this message. That's weird..."
+                logging.warning("More than one signed part in this message. That's weird... {0}".format(self.message_id()))
             self._signed = True
             # todo: check signature, public key attached, etc
 
@@ -715,8 +717,10 @@ def main(fp):
     template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
 
     # email fetcher
+    logging.info("Fetching email messages")
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
+    logging.info("Found {0} messages".format(len(messages)))
     for message in messages:
         # respond to the email
         EmailSender(message, template_env, fp)
@@ -741,9 +745,9 @@ def check_bot_keypair(allow_new_key):
     fingerprint = gpg.has_secret_key_with_uid(expected_uid)
     if not fingerprint:
         if allow_new_key:
-            print 'Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid)
+            logging.info('Generating new OpenPGP keypair with user ID: {0}'.format(expected_uid))
             fingerprint = gpg.gen_key(config.PGP_NAME, config.PGP_EMAIL)
-            print 'Finished generating keypair. Fingerprint is: {0}'.format(fingerprint)
+            loggin.info('Finished generating keypair. Fingerprint is: {0}'.format(fingerprint))
         else:
             raise ValueError, "Could not find keypair for cryptobot"
 
@@ -754,8 +758,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Cryptobot arg parser")
     parser.add_argument('--generate-new-key',dest='allow_new_key',action='store_true')
     parser.add_argument('--no-generate-new-key',dest='allow_new_key',action='store_false')
+    parser.add_argument('-v','--verbose',dest='verbosity',action='count', default=0, help="increase logging level -- -v shows info messages, -vv adds debug messages")
     parser.set_defaults(allow_new_key=False)
     args = parser.parse_args()
+    logging.getLogger().setLevel({0:logging.WARNING, 1:logging.INFO, 2:logging.DEBUG}.get(args.verbosity, logging.WARNING))
 
     fp = check_bot_keypair(args.allow_new_key)
     main(fp)
