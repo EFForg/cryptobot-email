@@ -1,10 +1,10 @@
 From nobody Tue Sep 10 13:20:20 2013
-Delivered-To: icontherecord@gmail.com
+Delivered-To: cryptobot@cryptobot.org
 Received: by 10.221.40.135 with SMTP id tq7csp16543vcb;
  Tue, 10 Sep 2013 13:19:44 -0700 (PDT)
 X-Received: by 10.68.164.35 with SMTP id yn3mr1652024pbb.195.1378844384110;
  Tue, 10 Sep 2013 13:19:44 -0700 (PDT)
-Return-Path: <dan@eff.org>
+Return-Path: <justtesting@example.com>
 Received: from mail2.eff.org (mail2.eff.org. [64.147.188.12])
  by mx.google.com with ESMTPS id yk3si18388186pac.186.1969.12.31.16.00.00
  (version=TLSv1.2 cipher=RC4-SHA bits=128/128);
@@ -23,11 +23,11 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=eff.org;
 Received: ; Tue, 10 Sep 2013 13:19:43 -0700
 Message-ID: <522F7EDE.2020904@eff.org>
 Date: Tue, 10 Sep 2013 13:19:42 -0700
-From: Dan Auerbach <dan@eff.org>
+From: Jessica Testcase <justtesting@example.com>
 User-Agent: Mozilla/5.0 (X11; Linux x86_64;
  rv:17.0) Gecko/20130804 Thunderbird/17.0.8
 MIME-Version: 1.0
-To: icontherecord@gmail.com
+To: cryptobot@cryptobot.org
 Subject: thunderbird test1, subject leak
 X-Enigmail-Version: 1.4.6
 Content-Type: text/plain; charset=ISO-8859-1
@@ -36,9 +36,5 @@ Content-Transfer-Encoding: 7bit
 unencrypted, subject leak
 
 -- 
-Dan Auerbach
-Staff Technologist
-Electronic Frontier Foundation
-dan@eff.org
-415 436 9333 x134
+Jessica Testcase <justtesting@example.com>
 
