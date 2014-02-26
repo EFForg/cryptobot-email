@@ -34,6 +34,9 @@ virtualenv:
 
 ## Dev Notes
 
+On linux systems: if you get an error while trying to install requirements.txt, like "fatal error: Python.h: No such file or directory"
+    $ sudo apt-get install python-dev
+
 To run the tests:
 
     $ ./test.py
