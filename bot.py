@@ -1,4 +1,4 @@
-#printi!/usr/bin/env python
+#!/usr/bin/env python
 """
 An email bot to help you learn OpenPGP!
 """
