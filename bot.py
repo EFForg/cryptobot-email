@@ -316,7 +316,7 @@ class EmailFetcher(object):
         if self.use_maildir:
             pass
         else:
-            self.imap_mail.uid('store', message_id, '+FLAGS', '\\Deleted')
+            self.imap_mail.uid('store', message_id, '+FLAGS', '(\\Deleted)')
 
 class EmailSender(object):
     """Encrypt, sign & send emails
