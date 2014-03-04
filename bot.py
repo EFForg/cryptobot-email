@@ -325,17 +325,16 @@ class EmailSender(object):
 
     :ivar message: the *received* :class:`OpenPGPMessage` email
     :ivar env: Jinja template environment
-    :ivar str fp: the fingerprint for the bot itself
+    :ivar str fingerprint: the fingerprint for the bot itself
     :ivar html_template: Jinja template for HTML part of response
     :ivar txt_template: Jinja template for HTML part of response
     ;ivar sender: function to actually send email. Defaults to self.send_email(self, msg_string, from_email, to_email)
     """
-    # XXX rename fp to fingerprint
 
-    def __init__(self, message, env, fp, sender=None):
+    def __init__(self, message, env, fingerprint, sender=None):
         self.message = message
         self.env = env
-        self.fp = fp
+        self.fingerprint = fingerprint
         if not sender:
             sender = self.send_email
         self.sender = sender
@@ -355,10 +354,10 @@ class EmailSender(object):
         """
         # using this instead of msg.as_string(), because the header wrapping was causing sig verification problems
         # http://docs.python.org/2/library/email.message.html#email.message.Message.as_string
-        fp = StringIO()
-        g = Generator(fp, mangle_from_=False, maxheaderlen=0)
+        fingerprint = StringIO()
+        g = Generator(fingerprint, mangle_from_=False, maxheaderlen=0)
         g.flatten(msg)
-        text = fp.getvalue()
+        text = fingerprint.getvalue()
         return text
 
     def construct_and_send_email(self):
@@ -413,8 +412,8 @@ class EmailSender(object):
 
         # if the message is not encrypted, attach public key (#16)
         if not self.message.encrypted_right:
-            pubkey = str(self._gpg.export_keys(self.fp))
-            pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fp)[:-8])
+            pubkey = str(self._gpg.export_keys(self.fingerprint))
+            pubkey_filename = '{0} {1} (0x{2}) pub.asc'.format(config.PGP_NAME, config.PGP_EMAIL, str(self.fingerprint)[:-8])
 
             pubkey_part = MIMEBase('application', 'pgp-keys')
             pubkey_part.add_header('Content-Disposition', 'attachment; filename="%s"' % pubkey_filename)
@@ -704,12 +703,12 @@ class OpenPGPMessage(Message):
         """
         return self._pubkey_fingerprint
 
-def main(fp):
+def main(fingerprint):
     """main entry point, sorta. Fetches & replies to emails, etc..
 
-    :arg str fp: fingerprint of the bot itself
+    :arg str fingerprint: fingerprint of the bot itself
     """
-    # XXX rename fp to fingerprint
+    # XXX rename fingerprint to fingerprint
     # jinja2
     template_loader = jinja2.FileSystemLoader(searchpath="templates")
     template_env = jinja2.Environment(loader=template_loader, trim_blocks=True)
@@ -721,7 +720,7 @@ def main(fp):
     logging.info("Found {0} messages".format(len(messages)))
     for message in messages:
         # respond to the email
-        EmailSender(message, template_env, fp)
+        EmailSender(message, template_env, fingerprint)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
@@ -761,5 +760,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     logging.getLogger().setLevel({0:logging.WARNING, 1:logging.INFO, 2:logging.DEBUG}.get(args.verbosity, logging.WARNING))
 
-    fp = check_bot_keypair(args.allow_new_key)
-    main(fp)
+    fingerprint = check_bot_keypair(args.allow_new_key)
+    main(fingerprint)
