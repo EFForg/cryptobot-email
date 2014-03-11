@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import string
 from passlib.hash import sha1_crypt
 from random import SystemRandom
 from sqlalchemy import MetaData, Table, Column, String, ForeignKey, create_engine, Integer
