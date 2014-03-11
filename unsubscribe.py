@@ -41,6 +41,9 @@ class Database():
     self.hash_params = self.session.query(Hash).first()
 
   def setup(self):
+    # todo: avoid setting up if tables already exsit and/or have data?
+    # as long as we only read the first hash in __init__, we should be
+    # ok calling this function again, but it will add extra hash records
     SQLAlchemyBase.metadata.create_all(self.engine)
     self.session = sessionmaker(self.engine)()
     hash_count = self.session.query(Hash).count()
