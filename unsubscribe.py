@@ -73,6 +73,7 @@ def block_email(address, db):
       db.add(address)
 
 def getDatabase(url, setupDB=False):
+    db = None
     try:
       db = Database(url, setupDB)
     except OperationalError as e:
@@ -83,6 +84,7 @@ def getDatabase(url, setupDB=False):
       print e
       print "Did you forget to run `./unsubscribe --setup` ?"
       exit(1)
+    return db
 
 if __name__ == "__main__":
     import argparse
