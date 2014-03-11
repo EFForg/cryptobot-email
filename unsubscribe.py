@@ -34,31 +34,26 @@ class Database():
 
     if create:
       self.create()
-      self.session = sessionmaker(self.engine)()
-      self.create_hash_params() # requires self.session
     else:
-      self.session = sessionmaker(engine)()
+      self.session = sessionmaker(self.engine)()
 
-    self.hash_params = self.session.query(Hash).last()
+    self.hash_params = self.session.query(Hash).first()
 
   def create(self):
     SQLAlchemyBase.metadata.create_all(self.engine)
-
+    self.session = sessionmaker(self.engine)()
+    hash_count = self.session.query(Hash).count()
+    salt = self.random_string()
+    rounds = 12345
+    hash_params = Hash(hash_count + 1, salt, rounds)
+    self.session.add(hash_params)
+    self.session.commit()
 
   def random_string(self):
     return ''.join(SystemRandom.choice(string.ascii_uppercase + string.digits) for x in range(32))
 
-  def create_hash_params(self):
-    salt = self.random_string()
-    rounds = 12345
-    hash_params = Hash(salt, rounds)
-    self.session.add(hash_params)
-    self.session.commit()
-
   def hash(self, email_address):
     # todo: 1. support for other hash algorithms based on hash_params.name
-    #       2. hash using all the configs, iteratively. this way if the
-    #          salt is ever compromised, just add a new salt on top.
     return sha1_crypt.encrypt(address, rounds=self.hash_params.rounds, salt=self.hash_params.salt)
 
   def find(self, email_address):
