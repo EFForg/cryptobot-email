@@ -2,7 +2,7 @@
 
 from passlib.hash import sha1_crypt
 from random import SystemRandom
-from sqlalchemy import MetaData, Table, Column, String, ForeignKey, create_engine
+from sqlalchemy import MetaData, Table, Column, String, ForeignKey, create_engine, Integer
 from sqlalchemy.orm import mapper, relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 SQLAlchemyBase = declarative_base()
@@ -16,7 +16,7 @@ class BlockedEmail(SQLAlchemyBase):
 
 class Hash(SQLAlchemyBase):
   __tablename__ = 'hash'
-  uid = Column(Integer, primary_key=true)
+  uid = Column(Integer, primary_key=True)
   salt = Column(String)
   rounds = Column(Integer)
   name = Column(String) # just for reference
