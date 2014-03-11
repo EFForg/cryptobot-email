@@ -74,6 +74,7 @@ def getDatabase(url, create=False):
       db = Database(url, create)
     except OperationalError as e:
       print e
+      print "Check that the database exists and DATABASE_URL is configured correctly"
       exit(1)
 
 if __name__ == "__main__":
