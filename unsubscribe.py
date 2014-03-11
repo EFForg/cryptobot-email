@@ -46,15 +46,14 @@ class Database():
     # ok calling this function again, but it will add extra hash records
     SQLAlchemyBase.metadata.create_all(self.engine)
     self.session = sessionmaker(self.engine)()
-    hash_count = self.session.query(Hash).count()
     salt = self.random_string()
     rounds = 12345
-    hash_params = Hash(hash_count + 1, salt, rounds)
+    hash_params = Hash(salt, rounds)
     self.session.add(hash_params)
     self.session.commit()
 
   def random_string(self):
-    return ''.join(SystemRandom.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    return ''.join(SystemRandom().choice(string.ascii_uppercase + string.digits) for x in range(32))
 
   def hash(self, email_address):
     # todo: 1. support for other hash algorithms based on hash_params.name
