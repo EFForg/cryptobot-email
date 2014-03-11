@@ -5,6 +5,7 @@ from random import SystemRandom
 from sqlalchemy import MetaData, Table, Column, String, ForeignKey, create_engine, Integer
 from sqlalchemy.orm import mapper, relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import OperationalError
 SQLAlchemyBase = declarative_base()
 
 class BlockedEmail(SQLAlchemyBase):
@@ -73,15 +74,24 @@ def block_email(address, db):
     if not db.find(address):
       db.add(address)
 
+def getDatabase(url, create=False):
+    try:
+      db = Database(url, create)
+    except OperationalError as e:
+      print e
+      exit(1)
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Cryptobot unsubscribe parser")
     parser.add_argument('--create', dest='createDB', action='store_true', default=False)
     parser.add_argument('--add', dest='email', action='store')
+    args = parser.parse_args()
 
-    db = Database(config.DATABASE_URL, createDB)
+    from config import DATABASE_URL
+    db = getDatabase(DATABASE_URL, args.createDB)
 
-    if email:
+    if args.email:
       block_email(email)
 
     print db.session.query(BlockedEmail).all()

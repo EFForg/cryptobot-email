@@ -726,7 +726,7 @@ def main(fingerprint):
     logging.info("Found {0} messages".format(len(messages)))
 
 
-    db = unsubscribe.Database(config.DATABASE_URL)
+    db = unsubscribe.getDatabase(config.DATABASE_URL)
 
     for message in messages:
         if not db.find(message.sender_address()):
