@@ -30,8 +30,8 @@ class Hash(SQLAlchemyBase):
 
 
 class Database():
-  def __init__(self, url, setup=False):
-    self.engine = create_engine(url, echo=True)
+  def __init__(self, url, setup=False, debug=False):
+    self.engine = create_engine(url, echo=debug)
 
     if setup:
       self.setup()
@@ -72,10 +72,10 @@ def block_email(address, db):
     if not db.find(address):
       db.add(address)
 
-def getDatabase(url, setupDB=False):
+def getDatabase(url, setup=False, debug=False):
     db = None
     try:
-      db = Database(url, setupDB)
+      db = Database(url, setup, debug)
     except OperationalError as e:
       print e
       print "Check that the database exists and DATABASE_URL is configured correctly"
@@ -90,11 +90,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Cryptobot unsubscribe parser")
     parser.add_argument('--setup', dest='setupDB', action='store_true', default=False)
+    parser.add_argument('--debug', dest='debugDB', action='store_true', default=False)
     parser.add_argument('--add', dest='email', action='store')
     args = parser.parse_args()
 
     from config import DATABASE_URL
-    db = getDatabase(DATABASE_URL, args.setupDB)
+    db = getDatabase(DATABASE_URL, args.setupDB, args.debugDB)
 
     if args.email:
       block_email(email)
