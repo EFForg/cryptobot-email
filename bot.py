@@ -19,6 +19,7 @@ import jinja2
 import rfc822
 import quopri
 import logging
+import unsubscribe
 
 PGP_ARMOR_HEADER_MESSAGE   = "-----BEGIN PGP MESSAGE-----"
 PGP_ARMOR_HEADER_SIGNATURE = "-----BEGIN PGP SIGNATURE-----"
@@ -723,9 +724,14 @@ def main(fingerprint):
     fetcher = EmailFetcher(use_maildir=config.USE_MAILDIR)
     messages = fetcher.get_all_mail()
     logging.info("Found {0} messages".format(len(messages)))
+
+
+    db = unsubscribe.Database(config.DATABASE_URL)
+
     for message in messages:
-        # respond to the email
-        EmailSender(message, template_env, fingerprint)
+        if not db.find(message.sender_address()):
+          # respond to the email
+          EmailSender(message, template_env, fingerprint)
 
         # delete the email
         # (note: by default Gmail ignores the IMAP standard and archives email instead of deleting it
