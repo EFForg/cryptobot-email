@@ -5,7 +5,7 @@ from random import SystemRandom
 from sqlalchemy import MetaData, Table, Column, String, ForeignKey, create_engine, Integer
 from sqlalchemy.orm import mapper, relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 SQLAlchemyBase = declarative_base()
 
 class BlockedEmail(SQLAlchemyBase):
@@ -29,17 +29,17 @@ class Hash(SQLAlchemyBase):
 
 
 class Database():
-  def __init__(self, url, create=False):
+  def __init__(self, url, setup=False):
     self.engine = create_engine(url, echo=True)
 
-    if create:
-      self.create()
+    if setup:
+      self.setup()
     else:
       self.session = sessionmaker(self.engine)()
 
     self.hash_params = self.session.query(Hash).first()
 
-  def create(self):
+  def setup(self):
     SQLAlchemyBase.metadata.create_all(self.engine)
     self.session = sessionmaker(self.engine)()
     hash_count = self.session.query(Hash).count()
@@ -69,23 +69,27 @@ def block_email(address, db):
     if not db.find(address):
       db.add(address)
 
-def getDatabase(url, create=False):
+def getDatabase(url, setupDB=False):
     try:
-      db = Database(url, create)
+      db = Database(url, setupDB)
     except OperationalError as e:
       print e
       print "Check that the database exists and DATABASE_URL is configured correctly"
+      exit(1)
+    except ProgrammingError as e:
+      print e
+      print "Did you forget to run `./unsubscribe --setup` ?"
       exit(1)
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Cryptobot unsubscribe parser")
-    parser.add_argument('--create', dest='createDB', action='store_true', default=False)
+    parser.add_argument('--setup', dest='setupDB', action='store_true', default=False)
     parser.add_argument('--add', dest='email', action='store')
     args = parser.parse_args()
 
     from config import DATABASE_URL
-    db = getDatabase(DATABASE_URL, args.createDB)
+    db = getDatabase(DATABASE_URL, args.setupDB)
 
     if args.email:
       block_email(email)
