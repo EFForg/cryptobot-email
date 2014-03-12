@@ -98,5 +98,3 @@ if __name__ == "__main__":
         db.add(args.email)
       else:
         print "That email is already unsubscribed"
-
-    print db.session.query(BlockedEmail).all()
