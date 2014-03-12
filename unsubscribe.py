@@ -57,7 +57,7 @@ class Database():
 
   def hash(self, email_address):
     # todo: 1. support for other hash algorithms based on hash_params.name
-    return sha1_crypt.encrypt(address, rounds=self.hash_params.rounds, salt=self.hash_params.salt)
+    return sha1_crypt.encrypt(email_address, rounds=self.hash_params.rounds, salt=self.hash_params.salt)
 
   def find(self, email_address):
     self.session.query(BlockedEmail).filter_by(hashed_address=self.hash(email_address)).first()
