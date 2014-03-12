@@ -60,7 +60,7 @@ class Database():
     return sha1_crypt.encrypt(email_address, rounds=self.hash_params.rounds, salt=self.hash_params.salt)
 
   def find(self, email_address):
-    self.session.query(BlockedEmail).filter_by(hashed_address=self.hash(email_address)).first()
+    return self.session.query(BlockedEmail).filter_by(hashed_address=self.hash(email_address)).first()
 
   def add(self, email_address):
     block = BlockedEmail(self.hash(email_address))
