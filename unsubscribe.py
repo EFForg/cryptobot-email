@@ -68,10 +68,6 @@ class Database():
     self.session.commit()
 
 
-def block_email(address, db):
-    if not db.find(address):
-      db.add(address)
-
 def getDatabase(url, setup=False, debug=False):
     db = None
     try:
@@ -98,6 +94,9 @@ if __name__ == "__main__":
     db = getDatabase(DATABASE_URL, args.setupDB, args.debugDB)
 
     if args.email:
-      block_email(email)
+      if not db.find(args.email):
+        db.add(args.email)
+      else:
+        print "That email is already unsubscribed"
 
     print db.session.query(BlockedEmail).all()
