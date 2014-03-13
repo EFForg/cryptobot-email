@@ -47,8 +47,16 @@ run
 ```
 
 This will create the necessary database tables and generate a random salt for
-hashing email addresses. Once that's done, you can run the included Flask app
-to serve a simple unsubscribe form.
+hashing email addresses. Once that's done, you can add emails to the database
+by running
+
+```
+./unsubscribe.py --add foo@example.com
+
+```
+
+Alternatively you can run the included Flask app to serve a simple unsubscribe
+form for people to unsubscribe themselves.
 
 ```
 ./app.py    # http://localhost:5000/unsubscribe
