@@ -363,7 +363,7 @@ class EmailSender(object):
     def construct_and_send_email(self):
         """Do work of constructing & sending reply email. For internal use."""
         # who to respond to?
-        to_email = self.message.sender_address()
+        to_email = self.message.sender_address
         if not to_email:
             logging.error('Cannot decide who to respond to in %s' % (self.message_id()))
             return # XXX throw exception instead
@@ -702,10 +702,10 @@ class OpenPGPMessage(Message):
     @property
     def sender_address(self):
         address = None
-        if 'Reply-To' in self.message:
-            address = self.message['Reply-To']
-        elif 'From' in self.message:
-            address = self.message['From']
+        if 'Reply-To' in self:
+            address = self['Reply-To']
+        elif 'From' in self:
+            address = self['From']
         return address
 
 def main(fingerprint):

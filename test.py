@@ -194,7 +194,7 @@ class EmailSenderTest(unittest.TestCase):
     def test_unencrypted_message_reply_address(self):
         msg = bot.OpenPGPMessage(self.emails['unencrypted_thunderbird'],
                                  gpg=self.gpg)
-        bot.EmailSender(msg, self.env, fp= '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387',  sender=self.get_mock_sender())
+        bot.EmailSender(msg, self.env, fingerprint= '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387',  sender=self.get_mock_sender())
         self.assertTrue('justtesting@example.com' in self.reply_to)
 
 
