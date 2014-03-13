@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import config
 import unsubscribe as unsub
 from flask import Flask, render_template, request

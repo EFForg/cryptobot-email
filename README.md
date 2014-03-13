@@ -39,10 +39,19 @@ virtualenv:
 
 To avoid exploitation as an automated spam cannon, cryptobot can optionally
 maintain a database of unsubscribers. It requires one additional setup step.
-After installing requirements, uncomment the DATABASE_URL in config.py.
+After installing requirements, uncomment the DATABASE_URL in config.py, and
+run
 
 ```
 ./unsubscribe.py --setup
+```
+
+This will create the necessary database tables and generate a random salt for
+hashing email addresses. Once that's done, you can run the included Flask app
+to serve a simple unsubscribe form.
+
+```
+./app.py    # http://localhost:5000/unsubscribe
 ```
 
 For simplicity, you can use an sqlite database, which is created as a normal
