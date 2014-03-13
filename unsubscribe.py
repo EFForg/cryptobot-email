@@ -75,11 +75,9 @@ def getDatabase(url, setup=False, debug=False):
     except OperationalError as e:
       print e
       print "Check that the database exists and DATABASE_URL is configured correctly"
-      exit(1)
     except ProgrammingError as e:
       print e
       print "Did you forget to run `./unsubscribe --setup` ?"
-      exit(1)
     return db
 
 if __name__ == "__main__":
@@ -92,6 +90,9 @@ if __name__ == "__main__":
 
     from config import DATABASE_URL
     db = getDatabase(DATABASE_URL, args.setupDB, args.debugDB)
+
+    if db is None:
+      exit(1)
 
     if args.email:
       if not db.find(args.email):
