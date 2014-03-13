@@ -203,7 +203,7 @@ class EmailSenderTest(unittest.TestCase):
 
 class UnsubscribeTest(unittest.TestCase):
     def setUp(self):
-      self.db = unsubscribe.getDatabase('sqlite:///test/test.db', setup=True)
+      self.db = unsubscribe.getDatabase('sqlite:///test/homedir/test.db', setup=True)
 
     def tearDown(self):
       unsubscribe.BlockedEmail.metadata.drop_all(self.db.engine)
