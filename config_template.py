@@ -21,7 +21,5 @@ SMTP_USERNAME = ""
 SMTP_PASSWORD = ""
 
 # URL for the unsubscribe database
-# setup:
-#  $ createdb cryptobot      # creates a postgres database
-#  $ ./unsubscribe --setup   # creates tables and random salt in that database
-DATABASE_URL = 'postgresql://username:password@localhost/cryptobot'
+# To set up the database run `./unsubscribe --setup`
+DATABASE_URL = 'sqlite:///%s/cryptobot.db' % GPG_HOMEDIR

@@ -725,8 +725,10 @@ def main(fingerprint):
     messages = fetcher.get_all_mail()
     logging.info("Found {0} messages".format(len(messages)))
 
-
     db = unsubscribe.getDatabase(config.DATABASE_URL)
+    if db is None:
+      print "Failed to connect to unsubscribe database url '%s'" % config.DATABASE_URL
+      sys.exit(1)
 
     for message in messages:
         if not db.find(message.sender_address()):
