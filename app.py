@@ -10,8 +10,7 @@ db = None
 def unsubscribe():
       if request.method == 'POST':
         email_address = request.form['email']
-        if not db.find(email_address):
-          db.add(email_address)
+        db.add(email_address)
         return "%s unsubscribed!" % email_address
       else:
         return render_template('unsubscribe.html')

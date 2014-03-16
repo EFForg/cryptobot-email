@@ -62,11 +62,15 @@ class Database():
   def find(self, email_address):
     return self.session.query(BlockedEmail).filter_by(hashed_address=self.hash(email_address)).first()
 
-  def add(self, email_address):
-    block = BlockedEmail(self.hash(email_address))
-    self.session.add(block)
-    self.session.commit()
+  def find_hashed(self, hashed_address):
+    return self.session.query(BlockedEmail).filter_by(hashed_address=hashed_address).first()
 
+  def add(self, email_address):
+    hashed_addres = self.hash(email_address)
+    if !self.find_hashed(hashed_address):
+      block = BlockedEmail(hashed_address)
+      self.session.add(block)
+      self.session.commit()
 
 def getDatabase(url, setup=False, debug=False):
     db = None
