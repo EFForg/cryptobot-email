@@ -9,9 +9,6 @@ import random
 import sys
 import jinja2
 
-from sqlalchemy.ext.declarative import declarative_base
-SQLAlchemyBase = declarative_base()
-
 class GnuPGTest(unittest.TestCase):
     def setUp(self):
         # test keys
