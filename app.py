@@ -19,5 +19,5 @@ if __name__ == '__main__':
       db = unsub.getDatabase(config.DATABASE_URL)
       if db is None:
         print "Failed to connect to unsubscribe database url '%s'" % config.DATABASE_URL
-        exit(1)
+        sys.exit(1)
       app.run()
