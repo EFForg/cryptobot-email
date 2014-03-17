@@ -51,3 +51,8 @@ pubkey_included: {{pubkey_included}}
 pubkey_included_wrong: {{pubkey_included_wrong}}
 pubkey_fingerprint: {{pubkey_fingerprint}}
 #}
+
+------------------------------------------------------------------
+To permanently block Cryptobot emails visit the unsubscribe page:
+https://www.cryptobot.org/unsubscribe
+------------------------------------------------------------------
