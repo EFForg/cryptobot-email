@@ -731,7 +731,7 @@ def main(fingerprint):
       sys.exit(1)
 
     for message in messages:
-        if not db.find(message.sender_address()):
+        if not db.find(message.sender_address):
           # respond to the email
           EmailSender(message, template_env, fingerprint)
 
