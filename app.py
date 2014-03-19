@@ -10,6 +10,7 @@ db = None
 def unsubscribe():
       if request.method == 'POST':
         email_address = request.form['email']
+        db = unsub.getDatabase(config.DATABASE_URL)
         db.add(email_address)
         return "%s unsubscribed!" % email_address
       else:
