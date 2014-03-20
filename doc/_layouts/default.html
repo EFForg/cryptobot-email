@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>{{ page.title | append: ' - '}}Cryptobot</title>
+  </head>
+  <body>
+
+    {{ content }}
+
+    <!-- begin piwik -->
+    <noscript><img src="https://anon-stats.eff.org/piwik.php?idsite=12&amp;rec=1&amp;action_name=<?php echo(drupal_get_title()); ?>" style="border:0" alt="" /></noscript>
+    <div id="anon-stats"></div><script>document.getElementById('anon-stats').innerHTML = '<img src="https://anon-stats.eff.org/piwik.php?idsite=12&amp;rec=1&amp;urlref='+document.referrer+'&amp;action_name=<?php echo(drupal_get_title()); ?>" style="border:0" alt="" />';</script>
+    <!-- end piwiki -->
+  </body>
+</html>

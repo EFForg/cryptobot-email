@@ -1,3 +1,5 @@
-# How to Sign an Email in Tails
+---
+title: How to Sign an Email in Tails
+---
 
 Coming soon.

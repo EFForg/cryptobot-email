@@ -1,3 +1,5 @@
-# Using OpenPGP in Tails
+---
+title: Using OpenPGP in Tails
+---
 
 Coming soon.

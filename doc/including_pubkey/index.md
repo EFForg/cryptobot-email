@@ -1,6 +1,8 @@
-# How to Send Someone Your Public Key
+---
+title: How to Send Someone Your Public Key
+---
 
-If you haven't read the [Getting Started](../getting_started/README.md) guide, go read it now first.
+If you haven't read the [Getting Started](/getting_started/) guide, go read it now first.
 
 Coming soon.
 

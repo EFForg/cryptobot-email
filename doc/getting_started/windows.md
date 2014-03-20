@@ -1,3 +1,5 @@
-# Using OpenPGP in Windows
+---
+title: Using OpenPGP in Windows
+---
 
 Coming soon.
