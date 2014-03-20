@@ -27,7 +27,7 @@ GPG Keychain Access is prompting you to generate a new keypair. Don't click Gene
 
 ![GPG Keychain Access, generating keypair](../images/osx/gpgtools3.png)
 
-PGP keys contain a name and an email address and some other settings. You're welcome to use a psuedonym. Whatever name you use is what others will see when they encrypt messages that only you can decrypt. It's important to enter the email address that you'll be using with this key to make it simpler for other people to send you encrypted messages. Check the "Upload public key after generation" box if you'd like to make it easier for others to get a copy of your public key so they can send you encrypted messages.
+PGP keys contain a name and an email address and some other settings. You're welcome to use a pseudonym. Whatever name you use is what others will see when they encrypt messages that only you can decrypt. It's important to enter the email address that you'll be using with this key to make it simpler for other people to send you encrypted messages. Check the "Upload public key after generation" box if you'd like to make it easier for others to get a copy of your public key so they can send you encrypted messages.
 
 Before generating the key, expand "Advanced options". You can leave the comment blank, and leave the key type "RSA and RSA (default)". But make sure to change the Length field to `4096`. You can also choose an expiration date. When your key expires, you can always extend it's expiration date.
 
