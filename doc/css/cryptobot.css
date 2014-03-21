@@ -1,0 +1,36 @@
+body { margin: 0; }
+
+.container {
+  max-width: 960px;
+  margin: auto;
+}
+
+.main {
+  max-width: 560px;
+}
+
+aside ul { float: left; }
+
+@media screen and (min-width: 40.5em) {
+  aside {
+    max-width: 200px;
+    float: left;
+  }
+
+  .main {
+    margin-left: 210px;
+  }
+}
+
+@media screen and (max-width: 40.5em) {
+  aside img { float: left; }
+  aside::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+.main img {
+  max-width: 100%;
+}
