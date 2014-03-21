@@ -1,6 +1,7 @@
 ---
 title: How to Sign an Email in Linux
 ---
+# How to Sign an Email in Linux
 
 If you followed the [Getting Started](/getting_started/) guide, you should be using Thunderbird and Enigmail for your email, and all of your emails should get signed by default. Let's check some settings to make sure Thunderbird is configured correctly for this.
 

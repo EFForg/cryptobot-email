@@ -1,6 +1,7 @@
 ---
 title: How to Send Someone Your Public Key
 ---
+# How to Send Someone Your Public Key
 
 If you haven't read the [Getting Started](/getting_started/) guide, go read it now first.
 
