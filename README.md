@@ -21,6 +21,8 @@ Set all of these settings:
 - `SMTP_SERVER`: The SMTP server to connect to, e.g. `smtp.gmail.com`
 - `SMTP_USERNAME`: The SMTP username
 - `SMTP_PASSWORD`: The SMTP password
+- `DATABASE_URL`: URL for the unsubscribe database
+
 
 This is a Python project with some external dependencies. We recommend using
 virtualenv:
@@ -31,6 +33,51 @@ virtualenv:
     (env) $ ./bot.py
     # when you're done
     (env) $ deactivate
+
+
+## Unsubscribes
+
+To avoid exploitation as an automated spam cannon, cryptobot can optionally
+maintain a database of unsubscribers. It requires one additional setup step.
+After installing requirements, uncomment the DATABASE_URL in config.py, and
+run
+
+```
+./unsubscribe.py --setup
+```
+
+This will create the necessary database tables and generate a random salt for
+hashing email addresses. Once that's done, you can add emails to the database
+by running
+
+```
+./unsubscribe.py --add foo@example.com
+
+```
+
+Alternatively you can run the included Flask app to serve a simple unsubscribe
+form for people to unsubscribe themselves.
+
+```
+./app.py    # http://localhost:5000/unsubscribe
+```
+
+For simplicity, you can use an sqlite database, which is created as a normal
+file in the directory of your choosing, and does not incur any extra
+dependencies. However, for better concurrency handling, you may want to install
+and use postgresql, which will require the psycopg2 python module along with
+some additional system configuration:
+
+```
+sudo apt-get install postgresql
+sudo -u postgres createuser -P -s -e cryptobot
+createdb cryptobot -O cryptobot
+sudo apt-get install postgresql-server-dev-9.1
+. env/bin/activate
+pip install psycopg
+deactivate
+```
+
 
 ## Dev Notes
 

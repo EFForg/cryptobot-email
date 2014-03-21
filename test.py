@@ -3,6 +3,7 @@
 import os
 import unittest
 import bot
+import unsubscribe
 import email
 import random
 import sys
@@ -196,6 +197,17 @@ class EmailSenderTest(unittest.TestCase):
                                  gpg=self.gpg)
         bot.EmailSender(msg, self.env, fingerprint= '0D4AF6E8D289BDE46594D41255BB44BA0D3E5387',  sender=self.get_mock_sender())
         self.assertTrue('justtesting@example.com' in self.reply_to)
+
+class UnsubscribeTest(unittest.TestCase):
+    def setUp(self):
+      self.db = unsubscribe.getDatabase('sqlite:///test/homedir/test.db', setup=True)
+
+    def tearDown(self):
+      unsubscribe.BlockedEmail.metadata.drop_all(self.db.engine)
+
+    def test_add(self):
+      self.db.add('test@example.com')
+      self.assertTrue(self.db.find('test@example.com') is not None)
 
 
 if __name__ == '__main__':

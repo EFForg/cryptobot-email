@@ -20,3 +20,6 @@ SMTP_SERVER = ""
 SMTP_USERNAME = ""
 SMTP_PASSWORD = ""
 
+# URL for the unsubscribe database
+# To set up the database run `./unsubscribe --setup`
+DATABASE_URL = 'sqlite:///%s/cryptobot.db' % GPG_HOMEDIR
