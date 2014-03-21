@@ -21,7 +21,7 @@ Set all of these settings:
 - `SMTP_SERVER`: The SMTP server to connect to, e.g. `smtp.gmail.com`
 - `SMTP_USERNAME`: The SMTP username
 - `SMTP_PASSWORD`: The SMTP password
-- `DATABASE_URL`: (Optional) URL for the unsubscribe database
+- `DATABASE_URL`: URL for the unsubscribe database
 
 
 This is a Python project with some external dependencies. We recommend using
