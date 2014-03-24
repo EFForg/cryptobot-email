@@ -2,9 +2,9 @@
 title: Getting Started With OpenPGP
 ---
 
-# Greetings, human.
+# Getting Started With OpenPGP
 
-I'm glad you're interested in using `OpenPGP`! It's a difficult technology to master, so don't feel bad if it takes some time to learn.  Before we jump in, I'm going to start with a little bit of the history, termonology, and concepts behind `OpenPGP`. If you want, you can the Introduction section to get started immediately.
+I'm glad you're interested in using `OpenPGP`! It's a difficult technology to master, so don't feel bad if it takes some time to learn.  Before we jump in, I'm going to start with a little bit of the history, termonology, and concepts behind `OpenPGP`. If you want, you can [skip the Introduction section](#setting_up_your_computer_for_openpgp) to get started immediately.
 
 ## Introduction
 
@@ -24,7 +24,7 @@ Since you need other people's `public keys` in order to encrypt messages to them
 
 Using `PGP` for email encryption can be very inconvenient. For example, if you set up `PGP` on your computer but have received an encrypted email on your phone, you won't be able to decrypt it to read the email until you get to your computer. However, if you use it correctly and keep your `secret key` from getting compromised, it works to keep the contents of your email private from everyone else, including the people who run your email server.
 
-## Seting Up Your Computer for OpenPGP
+## Setting Up Your Computer for OpenPGP
 
 The first step is installing the appropriate software. You need to download and install `GPG` on your computer, generate a `PGP keypair`, and install and configure an email client that supports `OpenPGP` integration. You can use `OpenPGP` with your Gmail or other webmail account, but you won't be able to use webmail for encrypting, decrypting, and verifying emails.
 
