@@ -1,3 +1,6 @@
+---
+title: Using OpenPGP in Mac OS X
+---
 # Using OpenPGP in Mac OS X
 
 Greetings, Mac users! To get started, first you need to install `GPG`, and then you need to install and configure an email client. We recommend that you use Thunderbird because it's free and open source. However if you prefer to use proprietary software, you can also use Apple Mail. Instructions for both are below.

@@ -1,6 +1,10 @@
+---
+title: How to Sign an Email
+---
+
 # How to Sign an Email
 
-If you haven't read the [Getting Started](../getting_started/README.md) guide, go read it now first.
+If you haven't read the [Getting Started](/getting_started/) guide, go read it now first.
 
 It's important to digitally sign emails that you send so that people you email can confirm that you wrote them, and not from someone that's spoofing your email address or hacking into your email account. This is possible using PGP.
 
@@ -34,7 +38,7 @@ In this way, PGP signatures are much better than meatspace signatures. It's poss
 
 What setup are you using? I'll explain how to sign your emails in the operating system of your choice:
 
-* [Windows](windows.md)
-* [Mac OS X](osx.md)
-* [Linux](linux.md) (Ubuntu, Debian, Fedora, etc.)
-* [Tails](tails.md)
+* [Windows](windows.html)
+* [Mac OS X](osx.html)
+* [Linux](linux.html) (Ubuntu, Debian, Fedora, etc.)
+* [Tails](tails.html)

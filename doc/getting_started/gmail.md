@@ -1,3 +1,6 @@
+---
+title: Configure Your Gmail Account
+---
 # Configure Your Gmail Account
 
 In order to use an email client that support `OpenPGP` integration with your Gmail account, first you'll need to enable IMAP support.

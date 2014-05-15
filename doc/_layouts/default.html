@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>{{ page.title | append: ' - '}}Cryptobot</title>
+  <link rel="stylesheet" href="/css/cryptobot.css">
+  <link rel="stylesheet" href="/css/markdown.css">
+  </head>
+  <body>
+
+    <div class='container'>
+      <aside>
+        <a href='/'><img src='/images/cryptobot-small.png'></a>
+        <ul>
+          <li><a href="/getting_started/">Getting Started</a></li>
+          <li><a href="/signing_email/">How to Sign an Email</a></li>
+          <li><a href="/encrypting_email/">How to Encrypt an Email</a></li>
+          <li><a href="/including_pubkey/">How to Send Someone Your Public Key</a></li>
+        </ul>
+      </aside>
+      <div class='main markdown'>
+        {{ content }}
+      </div>
+    </div>
+
+    <!-- begin piwik -->
+    <noscript><img src="https://anon-stats.eff.org/piwik.php?idsite=12&amp;rec=1&amp;action_name=<?php echo(drupal_get_title()); ?>" style="border:0" alt="" /></noscript>
+    <div id="anon-stats"></div><script>document.getElementById('anon-stats').innerHTML = '<img src="https://anon-stats.eff.org/piwik.php?idsite=12&amp;rec=1&amp;urlref='+document.referrer+'&amp;action_name=<?php echo(drupal_get_title()); ?>" style="border:0" alt="" />';</script>
+    <!-- end piwiki -->
+  </body>
+</html>

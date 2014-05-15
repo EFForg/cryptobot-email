@@ -47,3 +47,4 @@ sphinx/_build
 config.py
 test/homedir/
 homedir/
+doc/_site

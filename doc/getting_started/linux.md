@@ -1,3 +1,6 @@
+---
+title: Using OpenPGP in Linux
+---
 # Using OpenPGP in Linux
 
 Greetings, Linux users!
