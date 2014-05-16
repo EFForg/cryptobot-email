@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import os
 import config
 import unsubscribe as unsub
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 app = Flask(__name__)
 db = None
 
@@ -15,6 +16,11 @@ def unsubscribe():
         return "%s unsubscribed!" % email_address
       else:
         return render_template('unsubscribe.html')
+
+@app.route('/push', methods=['POST'])
+def push():
+  os.system("cd /www/cryptobot/cryptobot-email && ./pull.sh")
+  return Response(status=200)
 
 if __name__ == '__main__':
       db = unsub.getDatabase(config.DATABASE_URL)
