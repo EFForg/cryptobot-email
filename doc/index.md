@@ -6,8 +6,6 @@ title: CryptoBot Email Documentation
 
 CryptoBot Email is an email bot that helps people learn how to use OpenPGP. You send CryptoBot a PGP-encrypted and signed email (probably using GnuPG) and it responds telling you how you do, and offering advice.
 
-I am making exciting new typos here!
-
 
 * [Getting Started](getting_started/)
 * [How to Sign an Email](signing_email/)
